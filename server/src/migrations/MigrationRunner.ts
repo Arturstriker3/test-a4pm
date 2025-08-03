@@ -151,7 +151,7 @@ export class MigrationRunner {
       }
     }
 
-    console.log("🎉 All pending migrations completed successfully!");
+    console.log("✅ All pending migrations completed successfully!");
   }
 
   async rollbackLastMigration(): Promise<void> {

@@ -9,7 +9,6 @@ const migration: Migration = {
     await connection.execute(`
       ALTER TABLE teste_receitas_rg_sistemas.usuarios 
       ADD COLUMN recovery_token VARCHAR(255) NULL,
-      ADD COLUMN recovery_token_expires DATETIME NULL,
       ADD INDEX idx_recovery_token (recovery_token);
     `);
   },
@@ -18,7 +17,6 @@ const migration: Migration = {
     await connection.execute(`
       ALTER TABLE teste_receitas_rg_sistemas.usuarios 
       DROP INDEX idx_recovery_token,
-      DROP COLUMN recovery_token_expires,
       DROP COLUMN recovery_token;
     `);
   },

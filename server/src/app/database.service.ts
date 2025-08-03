@@ -2,8 +2,10 @@ import { createConnection } from "../config/database";
 import { MigrationRunner } from "../migrations/MigrationRunner";
 
 export async function connectDatabase(): Promise<void> {
+  console.log("🔄 Initializing database connection...");
   await connectWithRetry();
   await runMigrations();
+  console.log("✅ Database initialization completed!");
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -43,13 +45,25 @@ export async function testDatabaseConnection(): Promise<void> {
 }
 
 async function runMigrations(): Promise<void> {
+  const shouldRunMigrations = process.env.RUN_MIGRATIONS !== "false";
+
+  if (!shouldRunMigrations) {
+    console.log("ℹ️  Migrations skipped (RUN_MIGRATIONS=false)");
+    return;
+  }
+
+  console.log("🔄 Starting migration process...");
   const runner = new MigrationRunner();
 
   try {
     await runner.connect();
     await runner.runPendingMigrations();
+    console.log("✅ Migration process completed successfully!");
   } catch (error) {
     console.error("❌ Migration execution failed:", error);
+    console.error(
+      "💡 Please check your database connection and migration files"
+    );
     throw error;
   } finally {
     await runner.disconnect();
