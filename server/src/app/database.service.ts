@@ -1,7 +1,9 @@
 import { createConnection } from "../config/database";
+import { MigrationRunner } from "../migrations/MigrationRunner";
 
 export async function connectDatabase(): Promise<void> {
   await connectWithRetry();
+  await runMigrations();
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -38,4 +40,18 @@ export async function testDatabaseConnection(): Promise<void> {
   const conn = await createConnection();
   await conn.ping();
   await conn.end();
+}
+
+async function runMigrations(): Promise<void> {
+  const runner = new MigrationRunner();
+
+  try {
+    await runner.connect();
+    await runner.runPendingMigrations();
+  } catch (error) {
+    console.error("❌ Migration execution failed:", error);
+    throw error;
+  } finally {
+    await runner.disconnect();
+  }
 }
