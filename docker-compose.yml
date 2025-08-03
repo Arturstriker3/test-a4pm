@@ -1,28 +1,11 @@
 version: "3.8"
 services:
-  server:
-    build: ./server
-    ports:
-      - "3000:3000"
-    environment:
-      - DB_HOST=db
-      - DB_USER=admin
-      - DB_PASSWORD=admin
-      - DB_NAME=recipes
-    depends_on:
-      - db
-  client:
-    build: ./client
-    ports:
-      - "8080:8080"
-    depends_on:
-      - server
   db:
-    image: mysql:8.0
+    image: mariadb:latest
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: recipes
+      MYSQL_DATABASE: teste_receitas_rg_sistemas
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
     ports:
