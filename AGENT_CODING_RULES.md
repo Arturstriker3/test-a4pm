@@ -1,56 +1,63 @@
-# Coding Rules for RG Receitas Culinárias
+# Coding Rules & Project Specs – RG Receitas Culinárias (Tech Lead)
 
-Olá, Arthur! 🙂
+## Objetivo
 
-Parabéns! Você avançou para a próxima etapa do nosso processo seletivo para a vaga de Desenvolvedor Web – Full Stack.
+Implementar o máximo de funcionalidades descritas abaixo, seguindo as restrições e diferenciais obrigatórios para nível Tech Lead.
 
-## 1. Coding Rules
+## Funcionalidades Obrigatórias
 
-Siga sempre estas regras ao criar ou editar código neste repositório:
+- Cadastro de usuário no sistema
+- Login de usuário
+- Logoff de usuário
+- Cadastro de receitas pelo usuário
+- Pesquisa de receitas cadastradas pelo usuário
+- Edição de uma receita
+- Exclusão de uma receita
+- Impressão de uma receita
+
+## Banco de Dados
+
+O banco de dados deve ser MySQL. Os scripts e modelagem estão na pasta `database`.
+
+## Restrições
+
+- Backend: Node.js com TypeScript, API RESTful
+- Frontend: Vue.js, interface comunicando com backend
+- Banco de dados: MySQL
+- Guia detalhado explicando como rodar o sistema
+
+## Diferenciais (Obrigatórios para Tech Lead)
+
+- Documentação da API com Swagger
+- Uso de Docker
+- Testes unitários e de integração (E2E)
+
+## Coding Rules
 
 1. Se uma alteração proposta exceder 300 linhas de código, primeiro sugira as ideias e explique antes de implementar.
-2. Não gere comentários no código, exceto se solicitado no padrao de args (Argumentos).
+2. Não gere comentários no código, exceto se solicitado no padrão de args (Argumentos).
    - Exemplo: `// @args { "name": "string", "age": "number" }`
    - Isso ajuda a manter o código limpo e focado na lógica.
 3. Use boas práticas de engenharia de software e código limpo.
 4. Use nomes e termos em inglês por padrão.
 5. Sugestões de melhorias são bem-vindas.
 
-## 2. Project Overview
-
-Este projeto é uma aplicação de receitas culinárias composta por:
-
-- **Backend:** API REST desenvolvida com Node.js e TypeScript.
-- **Frontend:** Interface web criada com Vue.js, integrada ao backend.
-- **Banco de Dados:** MySQL.
-
-O objetivo é permitir o cadastro, consulta, atualização e remoção de receitas culinárias.
-
-## 3. Como Executar
-
-Inclua um guia detalhado com instruções para rodar o sistema (backend, frontend e banco de dados).
-
-## 4. Diferenciais
-
-- Documentação da API com Swagger.
-- Uso de Docker para facilitar o setup.
-- Testes unitários e de integração (E2E).
-
-## 5. Development Roadmap
+## Roadmap Sugerido
 
 1. **Project Setup**
-   - Inicializar repositório e ambiente Node.js/TypeScript.
-   - Instalar dependências do backend e frontend.
-2. **API REST**
-   - Implementar endpoints para CRUD de receitas.
-   - Integrar com MySQL.
-   - Documentar com Swagger.
-3. **Frontend**
-   - Criar interface com Vue.js.
-   - Integrar com a API.
-4. **Testes**
-   - Implementar testes unitários e E2E.
-5. **Docker**
-   - Adicionar arquivos de configuração para facilitar o deploy.
+   - Inicializar repositório e ambiente Node.js/TypeScript
+   - Instalar dependências do backend e frontend
+2. **Banco de Dados**
+   - Configurar MySQL usando scripts da pasta `database`
+3. **API REST**
+   - Implementar endpoints para autenticação e CRUD de receitas
+   - Documentar com Swagger
+4. **Frontend**
+   - Criar interface com Vue.js
+   - Integrar com a API
+5. **Testes**
+   - Implementar testes unitários e E2E
+6. **Docker**
+   - Adicionar arquivos de configuração para facilitar o deploy
 
 Sinta-se livre para adaptar ou expandir conforme necessário.
