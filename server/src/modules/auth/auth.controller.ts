@@ -51,9 +51,6 @@ export class AuthController {
     schema: {
       type: "object",
       properties: {
-        success: {
-          type: "boolean",
-        },
         message: {
           type: "string",
         },
@@ -89,9 +86,6 @@ export class AuthController {
     schema: {
       type: "object",
       properties: {
-        success: {
-          type: "boolean",
-        },
         message: {
           type: "string",
         },

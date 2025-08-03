@@ -332,7 +332,7 @@ export async function setupCustomSwagger(app: FastifyInstance): Promise<void> {
 <!DOCTYPE html>
 <html>
 <head>
-  <title>API A4PM - Documentação</title>
+  <title>API - Doc</title>
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" />
   <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5.9.0/favicon-32x32.png" sizes="32x32" />
   <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5.9.0/favicon-16x16.png" sizes="16x16" />
