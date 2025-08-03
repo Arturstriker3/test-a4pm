@@ -1,0 +1,244 @@
+import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { container } from "../common/container";
+import { TYPES } from "../common/types";
+import {
+  getRouteMetadata,
+  getControllerPrefix,
+  HttpMethod,
+} from "../common/decorators/route.decorators";
+import {
+  getRouteAccess,
+  getAccessRoles,
+  RouteAccessType,
+} from "../modules/auth/decorators/access.decorators";
+import {
+  AuthMiddleware,
+  JwtPayload,
+} from "../common/middlewares/auth.middleware";
+import { UserRole } from "../modules/users/entities/user.entity";
+
+// Mapeamento dos controllers disponíveis
+const CONTROLLERS = {
+  AuthController: TYPES.AuthController,
+  UsersController: TYPES.UsersController,
+  CategoriesController: TYPES.CategoriesController,
+  RecipesController: TYPES.RecipesController,
+} as const;
+
+/**
+ * Registra automaticamente todas as rotas baseadas nos decorators dos controllers
+ */
+export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
+  for (const [controllerName, controllerType] of Object.entries(CONTROLLERS)) {
+    try {
+      // Tenta obter o controller do container
+      const controller = container.get(controllerType) as any;
+      const controllerClass = controller.constructor;
+
+      // Obtém o prefixo do controller
+      const controllerPrefix = getControllerPrefix(controllerClass);
+
+      // Obtém os metadados das rotas
+      const routes = getRouteMetadata(controllerClass);
+
+      if (routes.length === 0) {
+        console.log(`⚠️  No routes found for ${controllerName}`);
+        continue;
+      }
+
+      console.log(`🔧 Registering routes for ${controllerName}:`);
+
+      // Registra cada rota
+      for (const route of routes) {
+        const fullPath = `${controllerPrefix}${route.path}`;
+        const method = route.method.toLowerCase() as Lowercase<HttpMethod>;
+
+        // Obtém informações de acesso da rota
+        const accessType = getRouteAccess(controller, route.methodName);
+        const allowedRoles = getAccessRoles(controller, route.methodName);
+
+        // Cria o handler da rota
+        const routeHandler = createRouteHandler(
+          controller,
+          route.methodName,
+          accessType,
+          allowedRoles
+        );
+
+        // Cria as opções da rota para o Fastify (incluindo schema para Swagger)
+        const routeOptions = {
+          handler: routeHandler,
+          schema: createSwaggerSchema(
+            controllerPrefix,
+            route,
+            accessType,
+            allowedRoles
+          ),
+        };
+
+        // Registra a rota no Fastify
+        fastify[method](fullPath, routeOptions);
+
+        console.log(
+          `   ${method.toUpperCase()} ${fullPath} → ${controllerName}.${
+            route.methodName
+          }${accessType ? ` [${accessType}]` : ""}`
+        );
+      }
+    } catch (error) {
+      // Controller não está registrado no container ou não existe
+      console.log(
+        `⚠️  Controller ${controllerName} not available:`,
+        error instanceof Error ? error.message : error
+      );
+    }
+  }
+}
+
+/**
+ * Cria um handler para a rota que inclui autenticação e autorização
+ */
+function createRouteHandler(
+  controller: any,
+  methodName: string,
+  accessType?: RouteAccessType,
+  allowedRoles?: UserRole[]
+) {
+  return async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      // Verifica autenticação se necessário
+      if (accessType === RouteAccessType.AUTHENTICATED) {
+        // Extrai o token do header Authorization
+        const authHeader = request.headers.authorization;
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+          return reply.status(401).send({
+            success: false,
+            message: "Token de acesso requerido",
+          });
+        }
+
+        const token = authHeader.substring(7); // Remove "Bearer "
+
+        // Valida o token usando o AuthMiddleware
+        const user: JwtPayload | null = AuthMiddleware.verifyToken(token);
+
+        if (!user) {
+          return reply.status(401).send({
+            success: false,
+            message: "Token inválido",
+          });
+        }
+
+        // Verifica se o usuário tem o role necessário
+        if (allowedRoles && allowedRoles.length > 0) {
+          if (!allowedRoles.includes(user.role as UserRole)) {
+            return reply.status(403).send({
+              success: false,
+              message: "Acesso negado",
+            });
+          }
+        }
+
+        // Adiciona o usuário na request para uso no controller
+        (request as any).user = user;
+      }
+
+      // Prepara os parâmetros para o método do controller
+      const params = extractMethodParameters(request, methodName);
+
+      // Chama o método do controller
+      const result = await controller[methodName](...params);
+
+      // Se o resultado já é uma ApiResponse, retorna diretamente
+      if (result && typeof result === "object" && "success" in result) {
+        return reply.send(result);
+      }
+
+      // Caso contrário, envolve em uma resposta de sucesso
+      return reply.send({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      console.error(`Error in ${methodName}:`, error);
+      return reply.status(500).send({
+        success: false,
+        message: "Erro interno do servidor",
+      });
+    }
+  };
+}
+
+/**
+ * Extrai parâmetros para o método do controller baseado na request
+ */
+function extractMethodParameters(
+  request: FastifyRequest,
+  methodName: string
+): any[] {
+  const method = request.method.toLowerCase();
+  const hasParams = request.params && Object.keys(request.params).length > 0;
+  const hasQuery = request.query && Object.keys(request.query).length > 0;
+  const hasBody = request.body && Object.keys(request.body as any).length > 0;
+
+  // Para métodos com body (POST, PUT, PATCH)
+  if (["post", "put", "patch"].includes(method)) {
+    if (hasParams && hasBody) {
+      // Se tem parâmetros na URL e body, passa ambos
+      return [request.params, request.body];
+    } else if (hasBody) {
+      // Só body
+      return [request.body];
+    } else if (hasParams) {
+      // Só parâmetros
+      return [request.params];
+    }
+  }
+
+  // Para métodos GET e DELETE
+  if (hasParams && hasQuery) {
+    // Se tem ambos, passa parâmetros primeiro e query depois
+    return [request.params, request.query];
+  } else if (hasParams) {
+    // Só parâmetros da URL
+    return [request.params];
+  } else if (hasQuery) {
+    // Só query parameters
+    return [request.query];
+  }
+
+  // Sem parâmetros
+  return [];
+}
+
+/**
+ * Cria o schema do Swagger para uma rota específica
+ */
+function createSwaggerSchema(
+  controllerPrefix: string,
+  route: any,
+  accessType?: RouteAccessType,
+  allowedRoles?: UserRole[]
+) {
+  // Remove a barra inicial do prefixo para criar o nome da tag
+  const tagName =
+    controllerPrefix.replace(/^\//, "").charAt(0).toUpperCase() +
+    controllerPrefix.replace(/^\//, "").slice(1);
+
+  // Define a descrição baseada no tipo de acesso
+  let description = "";
+  if (accessType === RouteAccessType.PUBLIC) {
+    description += "🌐 Público";
+  } else if (accessType === RouteAccessType.AUTHENTICATED) {
+    description += "🔒 Requer autenticação";
+    if (allowedRoles && allowedRoles.length > 0) {
+      description += ` (${allowedRoles.join(", ")})`;
+    }
+  }
+
+  return {
+    tags: [tagName],
+    summary: `${route.method} ${route.methodName}`,
+    description: description || undefined,
+  };
+}

@@ -7,6 +7,8 @@ import { DatabaseService } from "../app/database.service";
 // Auth Module
 import { AuthService } from "../modules/auth/auth.service";
 import { AuthController } from "../modules/auth/auth.controller";
+import { RegisterUserUseCase } from "../modules/auth/use-cases/register-user.use-case";
+import { LoginUserUseCase } from "../modules/auth/use-cases/login-user.use-case";
 
 // Users Module
 import { UsersService } from "../modules/users/users.service";
@@ -34,6 +36,10 @@ container
 // Bind Auth Module
 container.bind<AuthService>(TYPES.AuthService).to(AuthService);
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
+container
+  .bind<RegisterUserUseCase>(TYPES.RegisterUserUseCase)
+  .to(RegisterUserUseCase);
+container.bind<LoginUserUseCase>(TYPES.LoginUserUseCase).to(LoginUserUseCase);
 
 // Bind Users Module
 container.bind<UsersService>(TYPES.UsersService).to(UsersService);

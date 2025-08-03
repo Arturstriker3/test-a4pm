@@ -29,11 +29,16 @@ export async function createFastifyApp(): Promise<FastifyInstance> {
   const prefix = process.env.SERVER_PREFIX || "/api";
   await app.register(
     async function (fastify) {
-      // TODO: Register plugins, routes, etc.
+      // Setup Swagger dentro do contexto com prefixo
+      const { setupSwagger } = await import("./swagger.service");
+      await setupSwagger(fastify);
+
+      // Registrar rotas automaticamente usando decorators
+      const { registerRoutes } = await import("./routes.service");
+      await registerRoutes(fastify);
     },
     { prefix }
   );
-
   return app;
 }
 
@@ -57,6 +62,7 @@ export async function startServer(app: FastifyInstance): Promise<void> {
     }
   } catch (err) {
     console.error(`❌ Failed to start server on port ${port}`);
+    console.error(`❌ Error details:`, err);
     console.error(
       "💡 Try changing the PORT in your .env file or kill the process using this port"
     );

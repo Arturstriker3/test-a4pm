@@ -12,16 +12,19 @@ import {
   AccessTo,
   RouteAccessType,
 } from "./decorators/access.decorators";
+import { Controller, Post } from "../../common/decorators";
 import { ApiResponse } from "../../common/responses";
 import { HandleClassExceptions } from "../../common/decorators";
 
 @injectable()
+@Controller("/auth")
 @HandleClassExceptions
 export class AuthController {
   constructor(
     @inject(TYPES.AuthService) private readonly authService: AuthService
   ) {}
 
+  @Post("/register")
   @RouteAccess(RouteAccessType.PUBLIC)
   async register(
     registerDto: RegisterDto
@@ -30,6 +33,7 @@ export class AuthController {
     return ApiResponse.created(response, "Usuário criado com sucesso");
   }
 
+  @Post("/login")
   @RouteAccess(RouteAccessType.PUBLIC)
   async login(loginDto: LoginDto): Promise<ApiResponse<LoginResponseDto>> {
     const response = await this.authService.login(loginDto);
