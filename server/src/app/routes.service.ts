@@ -78,6 +78,8 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
             accessType,
             allowedRoles
           ),
+          // Anexa validação mas não falha automaticamente (capturamos manualmente)
+          attachValidation: true,
         };
 
         // Registra a rota no Fastify
@@ -110,6 +112,11 @@ function createRouteHandler(
 ) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     try {
+      // Ignora erros de validação do Fastify (usamos class-validator)
+      if ((request as any).validationError) {
+        // Ignora erro de validação do Fastify, será tratado pelo class-validator
+      }
+
       // Verifica autenticação se necessário
       if (accessType === RouteAccessType.AUTHENTICATED) {
         // Extrai o token do header Authorization
@@ -281,20 +288,13 @@ function createSwaggerSchema(
     description: description,
   };
 
-  // Adiciona requestBody se houver metadados de body - APENAS PARA SWAGGER, SEM VALIDAÇÃO
+  // Adiciona body schema APENAS para documentação Swagger (sem validação)
   if (swaggerMetadata.body) {
-    // Para Swagger documentation apenas, não para validação (usamos class-validator)
+    // Mantém o schema original com examples para documentação
     const bodySchema = { ...swaggerMetadata.body.schema };
-    if (bodySchema.properties) {
-      const cleanProperties: any = {};
-      for (const [key, value] of Object.entries(bodySchema.properties)) {
-        const { example, ...cleanValue } = value as any;
-        cleanProperties[key] = cleanValue;
-      }
-      bodySchema.properties = cleanProperties;
-    }
-    // Comentando para usar apenas class-validator
-    // schema.body = bodySchema;
+
+    // IMPORTANTE: Mantém os examples para mostrar na documentação
+    schema.body = bodySchema;
   }
 
   // Adiciona responses se houver metadados de resposta
