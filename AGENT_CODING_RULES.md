@@ -50,6 +50,10 @@ O backend deve ser organizado seguindo o padrão de módulos e separação de re
 4. Use nomes e termos em inglês por padrão.
 5. Sugestões de melhorias são bem-vindas.
 6. Todas as queries SQL devem ser pensadas e implementadas visando a melhor performance possível (uso de índices, joins eficientes, evitar N+1, etc).
+7. Verifique se o código está funcionando corretamente antes de enviar a sugestão e se já existe uma implementação similar, não gere código duplicado.
+8. Utilize o padrão de erros e exceções definido no arquivo `app-exceptions.ts` para tratamento de erros.
+9. Utilize o padrão de validação de DTOs definido no arquivo `validation.service.ts` para validação de dados de entrada.
+10. Utilize o padrão de autenticação e autorização definido no arquivo `auth.service.ts` para proteger rotas sensíveis.
 
 ## Roadmap Sugerido
 

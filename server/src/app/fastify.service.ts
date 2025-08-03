@@ -55,9 +55,9 @@ export async function createFastifyApp(): Promise<FastifyInstance> {
   const prefix = process.env.SERVER_PREFIX || "/api";
   await app.register(
     async function (fastify) {
-      // Setup Swagger dentro do contexto com prefixo
-      const { setupSwagger } = await import("./swagger.service");
-      await setupSwagger(fastify);
+      // Setup Custom Swagger dentro do contexto com prefixo
+      const { setupCustomSwagger } = await import("./custom-swagger.service");
+      await setupCustomSwagger(fastify);
 
       // Registrar rotas automaticamente usando decorators
       const { registerRoutes } = await import("./routes.service");
