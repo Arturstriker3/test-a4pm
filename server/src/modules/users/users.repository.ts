@@ -91,4 +91,19 @@ export class UsersRepository {
       alterado_em: row.alterado_em,
     };
   }
+
+  async updateRecoveryToken(
+    userId: string,
+    recoveryToken: string
+  ): Promise<void> {
+    const connection = await this.databaseService.getConnection();
+
+    const query = `
+      UPDATE teste_receitas_rg_sistemas.usuarios 
+      SET recovery_token = ?, alterado_em = NOW()
+      WHERE id = ?
+    `;
+
+    await connection.execute(query, [recoveryToken, userId]);
+  }
 }

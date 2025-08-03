@@ -1,4 +1,7 @@
-import { ConflictException } from "../../../common/exceptions";
+import {
+  ConflictException,
+  UnauthorizedException,
+} from "../../../common/exceptions";
 
 /**
  * Domain/Business Rules para o módulo de Users
@@ -10,13 +13,32 @@ import { ConflictException } from "../../../common/exceptions";
 export class UserBusinessRules {
   /**
    * Regra de Negócio: Email deve ser único no sistema
-   * Esta é uma regra específica de domínio que requer consulta ao banco
    */
   static validateUniqueEmail(existingUser: any): void {
     if (existingUser) {
       throw new ConflictException(
         "Já existe um usuário cadastrado com este email"
       );
+    }
+  }
+
+  /**
+   * Regra de Negócio: Usuário deve existir para realizar login
+   * Retorna mensagem genérica por segurança (não revela se usuário existe)
+   */
+  static validateUserForLogin(user: any): void {
+    if (!user) {
+      throw new UnauthorizedException("Email ou senha inválidos");
+    }
+  }
+
+  /**
+   * Regra de Negócio: Senha deve coincidir durante o login
+   * Retorna mensagem genérica por segurança (não revela que usuário existe)
+   */
+  static validatePasswordMatch(isPasswordValid: boolean): void {
+    if (!isPasswordValid) {
+      throw new UnauthorizedException("Email ou senha inválidos");
     }
   }
 }

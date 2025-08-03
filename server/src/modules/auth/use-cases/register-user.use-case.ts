@@ -13,7 +13,8 @@ import { v4 as uuidv4 } from "uuid";
  *
  * @param request - Dados do usuário para registro (RegisterDto)
  * @returns Promise<RegisterResponseDto> - Dados do usuário criado sem informações sensíveis
- * @throws ConflictException - Quando já existe um usuário com o email informado
+ * @throws ConflictException - Quando já existe um usuário com o email informado (UserBusinessRules.validateUniqueEmail)
+ * @throws ValidationError - Quando os dados do DTO são inválidos (class-validator)
  */
 @injectable()
 export class RegisterUserUseCase {
