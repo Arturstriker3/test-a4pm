@@ -1,5 +1,31 @@
+import { injectable } from "inversify";
+import mysql from "mysql2/promise";
 import { createConnection } from "../config/database";
 import { MigrationRunner } from "../migrations/MigrationRunner";
+
+@injectable()
+export class DatabaseService {
+  private connection: mysql.Connection | null = null;
+
+  async getConnection(): Promise<mysql.Connection> {
+    if (!this.connection) {
+      this.connection = await createConnection();
+    }
+    return this.connection;
+  }
+
+  async testConnection(): Promise<void> {
+    const conn = await this.getConnection();
+    await conn.ping();
+  }
+
+  async disconnect(): Promise<void> {
+    if (this.connection) {
+      await this.connection.end();
+      this.connection = null;
+    }
+  }
+}
 
 export async function connectDatabase(): Promise<void> {
   console.log("🔄 Initializing database connection...");
