@@ -57,6 +57,7 @@ O backend deve ser organizado seguindo o padrão de módulos e separação de re
    - Inicializar repositório e ambiente Node.js/TypeScript
    - Instalar dependências do backend e frontend
 2. **Banco de Dados** ✅
+
    - Banco MariaDB implementado e scripts já configurados na pasta `database`
 3. **API REST**
    - Implementar endpoints para autenticação e CRUD de receitas

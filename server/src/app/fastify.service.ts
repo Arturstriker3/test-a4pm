@@ -1,0 +1,65 @@
+import Fastify, { FastifyInstance } from "fastify";
+import { networkInterfaces } from "os";
+
+function getNetworkInfo(port: number, prefix: string = "") {
+  const networks = networkInterfaces();
+  const addresses: string[] = [];
+
+  for (const name of Object.keys(networks)) {
+    for (const net of networks[name] || []) {
+      if (net.family === "IPv4" && !net.internal) {
+        addresses.push(`http://${net.address}:${port}${prefix}`);
+      }
+    }
+  }
+
+  return {
+    local: `http://localhost:${port}${prefix}`,
+    network: addresses,
+  };
+}
+
+export async function createFastifyApp(): Promise<FastifyInstance> {
+  const app = Fastify({
+    logger: {
+      level: "warn",
+    },
+  });
+
+  const prefix = process.env.SERVER_PREFIX || "/api";
+  await app.register(
+    async function (fastify) {
+      // TODO: Register plugins, routes, etc.
+    },
+    { prefix }
+  );
+
+  return app;
+}
+
+export async function startServer(app: FastifyInstance): Promise<void> {
+  const port = Number(process.env.PORT) || 3000;
+  const host = "0.0.0.0";
+  const prefix = process.env.SERVER_PREFIX || "/api";
+
+  try {
+    await app.listen({ port, host });
+
+    const { local, network } = getNetworkInfo(port, prefix);
+
+    console.log(`🚀 Server running on:`);
+    console.log(`   Local:   ${local}`);
+
+    if (network.length > 0) {
+      network.forEach((addr) => {
+        console.log(`   Network: ${addr}`);
+      });
+    }
+  } catch (err) {
+    console.error(`❌ Failed to start server on port ${port}`);
+    console.error(
+      "💡 Try changing the PORT in your .env file or kill the process using this port"
+    );
+    process.exit(1);
+  }
+}
