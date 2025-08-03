@@ -36,6 +36,10 @@ O banco de dados deve ser MariaDB. Os scripts e modelagem estão na pasta `datab
 
 O projeto utiliza pnpm como gerenciador de pacotes padrão para backend e frontend.
 
+## Estrutura de Projeto
+
+O backend deve ser organizado seguindo o padrão de módulos e separação de responsabilidades inspirado no NestJS (pasta src, módulos, controllers, services, etc).
+
 ## Coding Rules
 
 1. Se uma alteração proposta exceder 300 linhas de código, primeiro sugira as ideias e explique antes de implementar.

@@ -15,6 +15,9 @@ app.listen({ port, host: "0.0.0.0" }, (err, address) => {
     app.log.error(err);
     process.exit(1);
   }
+  if (process.env.TSX_HOT) {
+    console.log("🔄 Server reloaded by hot reload (tsx)");
+  }
   const local = `http://localhost:${port}`;
   const nets = os.networkInterfaces();
   const ips: string[] = [];
