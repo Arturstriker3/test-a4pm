@@ -17,7 +17,7 @@ Implementar o máximo de funcionalidades descritas abaixo, seguindo as restriç�
 
 ## Banco de Dados
 
-O banco de dados deve ser MySQL. Os scripts e modelagem estão na pasta `database`.
+O banco de dados deve ser MariaDB. Os scripts e modelagem estão na pasta `database`.
 
 ## Restrições
 
@@ -32,6 +32,10 @@ O banco de dados deve ser MySQL. Os scripts e modelagem estão na pasta `databas
 - Uso de Docker
 - Testes unitários e de integração (E2E)
 
+## Gerenciador de Pacotes
+
+O projeto utiliza pnpm como gerenciador de pacotes padrão para backend e frontend.
+
 ## Coding Rules
 
 1. Se uma alteração proposta exceder 300 linhas de código, primeiro sugira as ideias e explique antes de implementar.
@@ -41,14 +45,15 @@ O banco de dados deve ser MySQL. Os scripts e modelagem estão na pasta `databas
 3. Use boas práticas de engenharia de software e código limpo.
 4. Use nomes e termos em inglês por padrão.
 5. Sugestões de melhorias são bem-vindas.
+6. Todas as queries SQL devem ser pensadas e implementadas visando a melhor performance possível (uso de índices, joins eficientes, evitar N+1, etc).
 
 ## Roadmap Sugerido
 
 1. **Project Setup**
    - Inicializar repositório e ambiente Node.js/TypeScript
    - Instalar dependências do backend e frontend
-2. **Banco de Dados**
-   - Configurar MySQL usando scripts da pasta `database`
+2. **Banco de Dados** ✅
+   - Banco MariaDB implementado e scripts já configurados na pasta `database`
 3. **API REST**
    - Implementar endpoints para autenticação e CRUD de receitas
    - Documentar com Swagger
