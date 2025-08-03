@@ -19,12 +19,14 @@ export interface ApiResponseOptions {
   status: number;
   description?: string;
   schema?: any;
+  type?: any; // Classe DTO
 }
 
 export interface ApiBodyOptions {
   schema?: any;
   description?: string;
   required?: boolean;
+  type?: any; // Classe DTO
 }
 
 export interface ApiTagOptions {
@@ -59,6 +61,17 @@ export function ApiResponse(options: ApiResponseOptions) {
     const existingResponses =
       Reflect.getMetadata(SWAGGER_METADATA.API_RESPONSE, target, propertyKey) ||
       [];
+
+    // Se um tipo DTO foi fornecido, gera o schema automaticamente
+    if (options.type && !options.schema) {
+      try {
+        const { getSchemaFromDto } = require("./schema.decorators");
+        options.schema = getSchemaFromDto(options.type);
+      } catch (error) {
+        console.warn("Não foi possível gerar schema do DTO:", error);
+      }
+    }
+
     existingResponses.push(options);
     Reflect.defineMetadata(
       SWAGGER_METADATA.API_RESPONSE,
@@ -77,6 +90,16 @@ export function ApiBody(options: ApiBodyOptions) {
     propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
+    // Se um tipo DTO foi fornecido, gera o schema automaticamente
+    if (options.type && !options.schema) {
+      try {
+        const { getSchemaFromDto } = require("./schema.decorators");
+        options.schema = getSchemaFromDto(options.type);
+      } catch (error) {
+        console.warn("Não foi possível gerar schema do DTO:", error);
+      }
+    }
+
     Reflect.defineMetadata(
       SWAGGER_METADATA.API_BODY,
       options,

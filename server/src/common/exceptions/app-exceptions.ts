@@ -39,6 +39,15 @@ export class BadRequestException extends AppException {
 }
 
 /**
+ * Exceção para erros de validação de schema/DTO
+ */
+export class ValidationException extends AppException {
+  constructor(message: string = "Erro de validação") {
+    super(message, HttpStatus.BAD_REQUEST);
+  }
+}
+
+/**
  * Exceção para conflito de dados (ex: email já existe)
  */
 export class ConflictException extends AppException {

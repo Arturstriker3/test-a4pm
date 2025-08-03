@@ -16,6 +16,10 @@ import {
   JwtPayload,
 } from "../common/middlewares/auth.middleware";
 import { UserRole } from "../modules/users/entities/user.entity";
+import { getMethodMetadata } from "../common/decorators/swagger.decorators";
+import { ValidationException } from "../common/exceptions";
+import { validate } from "class-validator";
+import { plainToClass } from "class-transformer";
 
 // Mapeamento dos controllers disponíveis
 const CONTROLLERS = {
@@ -146,6 +150,12 @@ function createRouteHandler(
       // Prepara os parâmetros para o método do controller
       const params = extractMethodParameters(request, methodName);
 
+      // Valida body com class-validator se for um método com body
+      const method = request.method.toLowerCase();
+      if (["post", "put", "patch"].includes(method) && request.body) {
+        await validateRequestBody(request.body, methodName, controller);
+      }
+
       // Chama o método do controller
       const result = await controller[methodName](...params);
 
@@ -160,6 +170,17 @@ function createRouteHandler(
         data: result,
       });
     } catch (error) {
+      // Se for ValidationException, retorna como BadRequest (sem log de erro)
+      if (error instanceof ValidationException) {
+        const response = error.toApiResponse();
+        return reply.status(response.code).send({
+          code: response.code,
+          message: response.message,
+          data: response.data,
+        });
+      }
+
+      // Para outros erros, loga e retorna erro interno
       console.error(`Error in ${methodName}:`, error);
       return reply.status(500).send({
         success: false,
@@ -225,9 +246,17 @@ function createSwaggerSchema(
     controllerPrefix.replace(/^\//, "").charAt(0).toUpperCase() +
     controllerPrefix.replace(/^\//, "").slice(1);
 
-  // Cria o nome/summary baseado no acesso
+  // Obtém metadados dos decorators Swagger
+  const controller = container.get(
+    TYPES[`${tagName}Controller` as keyof typeof TYPES]
+  ) as any;
+  const swaggerMetadata = getMethodMetadata(controller, route.methodName);
+
+  // Cria o nome/summary baseado no acesso ou usa o do decorator
   let summary = "";
-  if (accessType === RouteAccessType.PUBLIC) {
+  if (swaggerMetadata.operation?.summary) {
+    summary = swaggerMetadata.operation.summary;
+  } else if (accessType === RouteAccessType.PUBLIC) {
     summary = "🌐 Público";
   } else if (accessType === RouteAccessType.AUTHENTICATED) {
     if (allowedRoles && allowedRoles.length > 0) {
@@ -240,11 +269,79 @@ function createSwaggerSchema(
   }
 
   // Descrição com mais detalhes
-  const description = `Endpoint: ${route.methodName}`;
+  let description = `Endpoint: ${route.methodName}`;
+  if (swaggerMetadata.operation?.description) {
+    description = swaggerMetadata.operation.description;
+  }
 
-  return {
+  // Schema base
+  const schema: any = {
     tags: [tagName],
     summary: summary,
     description: description,
   };
+
+  // Adiciona requestBody se houver metadados de body - APENAS PARA SWAGGER, SEM VALIDAÇÃO
+  if (swaggerMetadata.body) {
+    // Para Swagger documentation apenas, não para validação (usamos class-validator)
+    const bodySchema = { ...swaggerMetadata.body.schema };
+    if (bodySchema.properties) {
+      const cleanProperties: any = {};
+      for (const [key, value] of Object.entries(bodySchema.properties)) {
+        const { example, ...cleanValue } = value as any;
+        cleanProperties[key] = cleanValue;
+      }
+      bodySchema.properties = cleanProperties;
+    }
+    // Comentando para usar apenas class-validator
+    // schema.body = bodySchema;
+  }
+
+  // Adiciona responses se houver metadados de resposta
+  if (swaggerMetadata.responses && swaggerMetadata.responses.length > 0) {
+    schema.response = {};
+    swaggerMetadata.responses.forEach((response: any) => {
+      schema.response[response.status] = {
+        description: response.description,
+        type: "object",
+        properties: response.schema?.properties || {},
+      };
+    });
+  }
+
+  return schema;
+}
+
+/**
+ * Valida o body da request usando class-validator
+ */
+async function validateRequestBody(
+  body: any,
+  methodName: string,
+  controller: any
+): Promise<void> {
+  // Mapeamento dos DTOs por método
+  const dtoMap: { [key: string]: any } = {
+    register: require("../modules/auth/dto").RegisterDto,
+    login: require("../modules/auth/dto").LoginDto,
+  };
+
+  const DtoClass = dtoMap[methodName];
+  if (!DtoClass) {
+    return; // Sem validação se não tiver DTO mapeado
+  }
+
+  // Converte o body para instância do DTO
+  const dto = plainToClass(DtoClass, body);
+
+  // Valida usando class-validator
+  const errors = await validate(dto);
+
+  if (errors.length > 0) {
+    // Pega a primeira mensagem de erro
+    const firstError = errors[0];
+    const message =
+      Object.values(firstError.constraints || {})[0] || "Erro de validação";
+    throw new ValidationException(message);
+  }
 }

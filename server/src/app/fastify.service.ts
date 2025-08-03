@@ -26,6 +26,28 @@ export async function createFastifyApp(): Promise<FastifyInstance> {
     },
   });
 
+  // Hook para customizar mensagens de erro de validação
+  app.setErrorHandler((error, request, reply) => {
+    // Se for erro de validação do schema (AJV)
+    if (error.statusCode === 400 && error.validation) {
+      const { ValidationException } = require("../common/exceptions");
+      const { ApiResponse } = require("../common/responses");
+
+      const cleanMessage = error.message.replace(/^body\//, "");
+      const validationError = new ValidationException(cleanMessage);
+      const response = validationError.toApiResponse();
+
+      return reply.status(response.code).send({
+        code: response.code,
+        message: response.message,
+        data: response.data,
+      });
+    }
+
+    // Para outros erros, usa o handler padrão
+    throw error;
+  });
+
   const prefix = process.env.SERVER_PREFIX || "/api";
   await app.register(
     async function (fastify) {
