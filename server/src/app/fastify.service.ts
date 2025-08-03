@@ -26,6 +26,10 @@ export async function createFastifyApp(): Promise<FastifyInstance> {
     },
   });
 
+  // Configurar CORS primeiro
+  const { setupCors } = await import("./cors.service");
+  await setupCors(app);
+
   // Hook para customizar mensagens de erro de validação
   app.setErrorHandler((error, request, reply) => {
     // Se for erro de validação do schema (AJV)
