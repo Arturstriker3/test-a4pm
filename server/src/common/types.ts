@@ -5,6 +5,7 @@ export const TYPES = {
   // Auth Module
   AuthService: Symbol.for("AuthService"),
   AuthController: Symbol.for("AuthController"),
+  RegisterUserUseCase: Symbol.for("RegisterUserUseCase"),
 
   // Users Module
   UsersService: Symbol.for("UsersService"),
