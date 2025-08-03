@@ -225,20 +225,26 @@ function createSwaggerSchema(
     controllerPrefix.replace(/^\//, "").charAt(0).toUpperCase() +
     controllerPrefix.replace(/^\//, "").slice(1);
 
-  // Define a descrição baseada no tipo de acesso
-  let description = "";
+  // Cria o nome/summary baseado no acesso
+  let summary = "";
   if (accessType === RouteAccessType.PUBLIC) {
-    description += "🌐 Público";
+    summary = "🌐 Público";
   } else if (accessType === RouteAccessType.AUTHENTICATED) {
-    description += "🔒 Requer autenticação";
     if (allowedRoles && allowedRoles.length > 0) {
-      description += ` (${allowedRoles.join(", ")})`;
+      summary = `🔒 ${allowedRoles.join(", ")}`;
+    } else {
+      summary = "🔒 Usuários Autenticados";
     }
+  } else {
+    summary = "🔓 Sem restrição";
   }
+
+  // Descrição com mais detalhes
+  const description = `Endpoint: ${route.methodName}`;
 
   return {
     tags: [tagName],
-    summary: `${route.method} ${route.methodName}`,
-    description: description || undefined,
+    summary: summary,
+    description: description,
   };
 }
