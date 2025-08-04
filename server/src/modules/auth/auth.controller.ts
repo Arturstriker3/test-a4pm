@@ -34,7 +34,7 @@ export class AuthController {
   @ApiOperation({
     summary: "Registrar novo usuário",
     description:
-      "Cria uma nova conta de usuário no sistema. Não requer autenticação.",
+      "Cria uma nova conta de usuário no sistema.",
   })
   @ApiBody({
     type: RegisterDto,

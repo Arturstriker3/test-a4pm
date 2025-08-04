@@ -41,11 +41,7 @@ export async function createFastifyApp(): Promise<FastifyInstance> {
       const validationError = new ValidationException(cleanMessage);
       const response = validationError.toApiResponse();
 
-      return reply.status(response.code).send({
-        code: response.code,
-        message: response.message,
-        data: response.data,
-      });
+      return reply.status(response.code).send(response.toJSON());
     }
 
     // Para outros erros, usa o handler padrão

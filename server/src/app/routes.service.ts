@@ -166,9 +166,21 @@ function createRouteHandler(
       // Chama o método do controller
       const result = await controller[methodName](...params);
 
-      // Se o resultado já é uma ApiResponse, retorna diretamente
-      if (result && typeof result === "object" && "success" in result) {
-        return reply.send(result);
+      // Se o resultado já é uma ApiResponse, usa o status correto e nova estrutura
+      if (
+        result &&
+        typeof result === "object" &&
+        "code" in result &&
+        "message" in result &&
+        typeof result.toJSON === "function"
+      ) {
+        const jsonResponse = result.toJSON();
+        // Para Fins de Debugging
+        // console.log("Sending response:", JSON.stringify(jsonResponse, null, 2));
+        return reply
+          .status(result.code)
+          .type("application/json")
+          .send(JSON.stringify(jsonResponse));
       }
 
       // Caso contrário, envolve em uma resposta de sucesso
@@ -180,11 +192,7 @@ function createRouteHandler(
       // Se for ValidationException, retorna como BadRequest (sem log de erro)
       if (error instanceof ValidationException) {
         const response = error.toApiResponse();
-        return reply.status(response.code).send({
-          code: response.code,
-          message: response.message,
-          data: response.data,
-        });
+        return reply.status(response.code).send(response.toJSON());
       }
 
       // Para outros erros, loga e retorna erro interno
