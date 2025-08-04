@@ -1,0 +1,21 @@
+import { injectable, inject } from "inversify";
+import { TYPES } from "../../../common/types";
+import { UsersRepository } from "../../users/users.repository";
+import { UserIdDto } from "@/modules/users/dto/id.dto";
+
+/**
+ * Use case responsável por remover o recovery_token do usuário (logout).
+ * @param userId - ID do usuário
+ */
+@injectable()
+export class LogoutUserUseCase {
+  constructor(
+    @inject(TYPES.UsersRepository)
+    private readonly usersRepository: UsersRepository
+  ) {}
+
+  async execute(userIdDto: UserIdDto): Promise<boolean> {
+    await this.usersRepository.updateRecoveryToken(userIdDto.id, null);
+    return true;
+  }
+}

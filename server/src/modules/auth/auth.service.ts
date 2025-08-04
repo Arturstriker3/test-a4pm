@@ -8,6 +8,8 @@ import {
 } from "./dto";
 import { RegisterUserUseCase } from "./use-cases/register-user.use-case";
 import { LoginUserUseCase } from "./use-cases/login-user.use-case";
+import { LogoutUserUseCase } from "./use-cases/logout-user.use-case";
+import { UserIdDto } from "../users/dto/id.dto";
 
 @injectable()
 export class AuthService {
@@ -15,7 +17,9 @@ export class AuthService {
     @inject(TYPES.RegisterUserUseCase)
     private readonly registerUserUseCase: RegisterUserUseCase,
     @inject(TYPES.LoginUserUseCase)
-    private readonly loginUserUseCase: LoginUserUseCase
+    private readonly loginUserUseCase: LoginUserUseCase,
+    @inject(TYPES.LogoutUserUseCase)
+    private readonly logoutUserUseCase: LogoutUserUseCase
   ) {}
 
   async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
@@ -24,5 +28,10 @@ export class AuthService {
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     return await this.loginUserUseCase.execute(loginDto);
+  }
+
+  async logout(userIdDto: UserIdDto): Promise<boolean> {
+    await this.logoutUserUseCase.execute(userIdDto);
+    return true;
   }
 }

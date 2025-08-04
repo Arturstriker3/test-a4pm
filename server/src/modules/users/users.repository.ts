@@ -94,7 +94,7 @@ export class UsersRepository {
 
   async updateRecoveryToken(
     userId: string,
-    recoveryToken: string
+    recoveryToken: string | null
   ): Promise<void> {
     const connection = await this.databaseService.getConnection();
 

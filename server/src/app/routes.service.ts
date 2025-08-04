@@ -17,7 +17,9 @@ import {
 } from "../common/middlewares/auth.middleware";
 import { UserRole } from "../modules/users/entities/user.entity";
 import { getMethodMetadata } from "../common/decorators/swagger.decorators";
+import { getParamMetadata } from "../common/decorators/param.decorator";
 import { ValidationException } from "../common/exceptions";
+import { ApiResponse } from "../common/responses";
 import { validate } from "class-validator";
 import { plainToClass } from "class-transformer";
 
@@ -122,10 +124,10 @@ function createRouteHandler(
         // Extrai o token do header Authorization
         const authHeader = request.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-          return reply.status(401).send({
-            success: false,
-            message: "Token de acesso requerido",
-          });
+          const response = ApiResponse.unauthorized(
+            "Token de acesso requerido"
+          );
+          return reply.status(response.code).send(response.toJSON());
         }
 
         const token = authHeader.substring(7); // Remove "Bearer "
@@ -134,19 +136,15 @@ function createRouteHandler(
         const user: JwtPayload | null = AuthMiddleware.verifyToken(token);
 
         if (!user) {
-          return reply.status(401).send({
-            success: false,
-            message: "Token inválido",
-          });
+          const response = ApiResponse.unauthorized("Token inválido");
+          return reply.status(response.code).send(response.toJSON());
         }
 
         // Verifica se o usuário tem o role necessário
         if (allowedRoles && allowedRoles.length > 0) {
           if (!allowedRoles.includes(user.role as UserRole)) {
-            return reply.status(403).send({
-              success: false,
-              message: "Acesso negado",
-            });
+            const response = ApiResponse.forbidden("Acesso negado");
+            return reply.status(response.code).send(response.toJSON());
           }
         }
 
@@ -154,8 +152,12 @@ function createRouteHandler(
         (request as any).user = user;
       }
 
-      // Prepara os parâmetros para o método do controller
-      const params = extractMethodParameters(request, methodName);
+      // Prepara os parâmetros para o método do controller usando decorators @Param
+      const params = await extractParametersWithDecorators(
+        request,
+        controller,
+        methodName
+      );
 
       // Valida body com class-validator se for um método com body
       const method = request.method.toLowerCase();
@@ -197,10 +199,8 @@ function createRouteHandler(
 
       // Para outros erros, loga e retorna erro interno
       console.error(`Error in ${methodName}:`, error);
-      return reply.status(500).send({
-        success: false,
-        message: "Erro interno do servidor",
-      });
+      const response = ApiResponse.internalError("Erro interno do servidor");
+      return reply.status(response.code).send(response.toJSON());
     }
   };
 }
@@ -245,6 +245,56 @@ function extractMethodParameters(
 
   // Sem parâmetros
   return [];
+}
+
+/**
+ * Extrai e valida parâmetros usando decorators @Param
+ * Nova funcionalidade similar ao NestJS
+ */
+async function extractParametersWithDecorators(
+  request: FastifyRequest,
+  controller: any,
+  methodName: string
+): Promise<any[]> {
+  const paramMetadata = getParamMetadata(controller, methodName);
+
+  if (paramMetadata.length === 0) {
+    // Fallback para o método antigo se não tiver decorators @Param
+    return extractMethodParameters(request, methodName);
+  }
+
+  // Ordenar por índice do parâmetro
+  paramMetadata.sort((a, b) => a.index - b.index);
+
+  const parameters: any[] = [];
+
+  for (const param of paramMetadata) {
+    const paramValue = (request.params as any)?.[param.paramName];
+
+    if (param.dtoClass) {
+      // Validar usando DTO
+      const dto = plainToClass(param.dtoClass, {
+        [param.paramName]: paramValue,
+      });
+      const errors = await validate(dto);
+
+      if (errors.length > 0) {
+        const firstError = errors[0];
+        const message =
+          Object.values(firstError.constraints || {})[0] ||
+          `Erro de validação no parâmetro ${param.paramName}`;
+        throw new ValidationException(message);
+      }
+
+      // Retorna apenas o valor validado
+      parameters[param.index] = paramValue;
+    } else {
+      // Sem validação, apenas passa o valor
+      parameters[param.index] = paramValue;
+    }
+  }
+
+  return parameters;
 }
 
 /**
@@ -350,6 +400,42 @@ async function validateRequestBody(
     const firstError = errors[0];
     const message =
       Object.values(firstError.constraints || {})[0] || "Erro de validação";
+    throw new ValidationException(message);
+  }
+}
+
+/**
+ * Valida parâmetros da URL usando class-validator (FUTURO)
+ * Atualmente o projeto usa validação manual nos controllers
+ */
+async function validateRequestParams(
+  params: any,
+  methodName: string,
+  controller: any
+): Promise<void> {
+  // Mapeamento dos DTOs para parâmetros por método
+  const paramDtoMap: { [key: string]: any } = {
+    // logout: require("../modules/users/dto").UserIdDto,
+    // Adicione aqui outros métodos que precisam validar parâmetros
+  };
+
+  const DtoClass = paramDtoMap[methodName];
+  if (!DtoClass) {
+    return; // Sem validação se não tiver DTO mapeado
+  }
+
+  // Converte os parâmetros para instância do DTO
+  const dto = plainToClass(DtoClass, params);
+
+  // Valida usando class-validator
+  const errors = await validate(dto);
+
+  if (errors.length > 0) {
+    // Pega a primeira mensagem de erro
+    const firstError = errors[0];
+    const message =
+      Object.values(firstError.constraints || {})[0] ||
+      "Erro de validação de parâmetros";
     throw new ValidationException(message);
   }
 }

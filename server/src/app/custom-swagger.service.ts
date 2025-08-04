@@ -188,6 +188,8 @@ export class CustomSwaggerService {
         // Processa cada rota
         for (const route of routes) {
           const fullPath = `${controllerPrefix}${route.path}`;
+          // Converte parâmetros do formato :id para {id} (formato OpenAPI)
+          const swaggerPath = fullPath.replace(/:(\w+)/g, "{$1}");
           const method = route.method.toLowerCase();
 
           // Obtém informações de acesso da rota
@@ -197,8 +199,8 @@ export class CustomSwaggerService {
           const metadata = getMethodMetadata(controller, route.methodName);
 
           // Cria entrada no paths do Swagger
-          if (!this.swaggerDefinition.paths[fullPath]) {
-            this.swaggerDefinition.paths[fullPath] = {};
+          if (!this.swaggerDefinition.paths[swaggerPath]) {
+            this.swaggerDefinition.paths[swaggerPath] = {};
           }
 
           const pathItem: any = {
@@ -208,7 +210,7 @@ export class CustomSwaggerService {
                 : [controllerName.replace("Controller", "")],
             summary:
               metadata.operation?.summary ||
-              `${route.method.toUpperCase()} ${fullPath}`,
+              `${route.method.toUpperCase()} ${swaggerPath}`,
             description: metadata.operation?.description || "",
             responses: this.processResponses(metadata.responses),
           };
@@ -228,7 +230,7 @@ export class CustomSwaggerService {
             pathItem.security = [{ BearerAuth: [] }];
           }
 
-          this.swaggerDefinition.paths[fullPath][method] = pathItem;
+          this.swaggerDefinition.paths[swaggerPath][method] = pathItem;
         }
       } catch (error) {
         console.warn(`Não foi possível processar ${controllerName}:`, error);

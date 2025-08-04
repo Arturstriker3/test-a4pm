@@ -12,7 +12,7 @@ import {
   AccessTo,
   RouteAccessType,
 } from "./decorators/access.decorators";
-import { Controller, Post } from "../../common/decorators";
+import { Controller, Post, Param } from "../../common/decorators";
 import { ApiResponse } from "../../common/responses";
 import {
   HandleClassExceptions,
@@ -23,6 +23,7 @@ import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
 } from "../../common/decorators";
+import { UserIdDto } from "../users/dto/id.dto";
 
 @injectable()
 @Controller("/auth")
@@ -77,5 +78,21 @@ export class AuthController {
   async login(loginDto: LoginDto): Promise<ApiResponse<LoginResponseDto>> {
     const response = await this.authService.login(loginDto);
     return ApiResponse.success(response, "Login realizado com sucesso");
+  }
+
+  @Post("/logout/:id")
+  @RouteAccess(RouteAccessType.AUTHENTICATED)
+  @ApiOperation({
+    summary: "Logout do usuário",
+    description: "Remove o recovery token do usuário logado.",
+  })
+  @ApiSuccessResponse({
+    description: "Logout realizado com sucesso",
+    dataType: null,
+  })
+  async logout(@Param("id", UserIdDto) id: string): Promise<ApiResponse<null>> {
+    const userIdDto: UserIdDto = { id: id };
+    await this.authService.logout(userIdDto);
+    return ApiResponse.success(null, "Logout realizado com sucesso");
   }
 }
