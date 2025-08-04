@@ -17,8 +17,11 @@ import { ApiResponse } from "../../common/responses";
 import {
   HandleClassExceptions,
   ApiOperation,
-  ApiResponse as ApiResponseDoc,
   ApiBody,
+  ApiCreatedResponse,
+  ApiSuccessResponse,
+  ApiBadRequestResponse,
+  ApiUnauthorizedResponse,
 } from "../../common/decorators";
 
 @injectable()
@@ -33,29 +36,18 @@ export class AuthController {
   @RouteAccess(RouteAccessType.PUBLIC)
   @ApiOperation({
     summary: "Registrar novo usuário",
-    description:
-      "Cria uma nova conta de usuário no sistema.",
+    description: "Cria uma nova conta de usuário no sistema.",
   })
   @ApiBody({
     type: RegisterDto,
     description: "Dados para registro de usuário",
   })
-  @ApiResponseDoc({
-    status: 201,
+  @ApiCreatedResponse({
     description: "Usuário registrado com sucesso",
-    type: RegisterResponseDto,
+    dataType: RegisterResponseDto,
   })
-  @ApiResponseDoc({
-    status: 400,
-    description: "Dados inválidos",
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-        },
-      },
-    },
+  @ApiBadRequestResponse({
+    messageExample: "Email já está em uso",
   })
   async register(
     registerDto: RegisterDto
@@ -75,22 +67,12 @@ export class AuthController {
     type: LoginDto,
     description: "Credenciais de login",
   })
-  @ApiResponseDoc({
-    status: 200,
+  @ApiSuccessResponse({
     description: "Login realizado com sucesso",
-    type: LoginResponseDto,
+    dataType: LoginResponseDto,
   })
-  @ApiResponseDoc({
-    status: 401,
-    description: "Credenciais inválidas",
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-        },
-      },
-    },
+  @ApiUnauthorizedResponse({
+    messageExample: "Credenciais inválidas",
   })
   async login(loginDto: LoginDto): Promise<ApiResponse<LoginResponseDto>> {
     const response = await this.authService.login(loginDto);
