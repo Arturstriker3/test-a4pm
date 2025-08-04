@@ -1,5 +1,6 @@
 import { HttpMessages } from "../responses/http-status";
 import { ApiResponse as ApiResponseDoc } from "./swagger.decorators";
+import { SCHEMA_PROPERTY_METADATA } from "./schema.decorators";
 
 /**
  * Interface para definir exemplos de propriedades
@@ -66,54 +67,91 @@ function generateDataSchema(dataType: any, examples?: PropertyExample) {
     };
   }
 
-  // Cria uma instância temporária do DTO para analisar suas propriedades
-  let instance;
-  try {
-    // Tenta criar uma instância do DTO
-    if (typeof dataType === "function") {
-      // Se for uma classe, tenta instanciar (mesmo que dê erro, vamos capturar)
-      try {
-        instance = new dataType();
-      } catch {
-        // Se não conseguir instanciar com construtor vazio, usa objeto vazio
-        instance = {};
-      }
-    } else {
-      instance = dataType;
-    }
-  } catch {
-    return {
-      type: "object",
-      additionalProperties: true,
-    };
-  }
-
-  // Gera as propriedades baseado no DTO
   const properties: any = {};
 
-  // Pega as propriedades do protótipo da classe se disponível
-  if (dataType.prototype) {
-    const descriptors = Object.getOwnPropertyDescriptors(dataType.prototype);
-    Object.keys(descriptors).forEach((key) => {
-      if (key !== "constructor") {
-        properties[key] = generatePropertySchema(key, examples);
-      }
-    });
+  try {
+    // Cria uma instância temporária para acessar os metadados
+    const instance = new dataType({});
+
+    // Lê os metadados do @SchemaProperty
+    const schemaMetadata =
+      Reflect.getMetadata(SCHEMA_PROPERTY_METADATA, instance) || {};
+
+    // Pega todas as propriedades da instância
+    const propertyKeys = Object.keys(instance);
+
+    if (propertyKeys.length > 0) {
+      // Usa as propriedades reais do DTO
+      propertyKeys.forEach((key) => {
+        const metadata = schemaMetadata[key];
+
+        if (metadata) {
+          // Usa os metadados do @SchemaProperty
+          properties[key] = {
+            type: metadata.type || "string",
+            description: metadata.description,
+            example: examples?.[key] || metadata.example,
+            format: metadata.format,
+            enum: metadata.enum,
+          };
+
+          // Remove propriedades undefined
+          Object.keys(properties[key]).forEach((prop) => {
+            if (properties[key][prop] === undefined) {
+              delete properties[key][prop];
+            }
+          });
+        } else {
+          // Fallback para propriedades sem @SchemaProperty
+          properties[key] = generatePropertySchema(key, examples);
+        }
+      });
+    } else {
+      // Fallback se não conseguir criar instância
+      return generateFallbackSchema(dataType, examples);
+    }
+  } catch (error) {
+    console.warn("Erro ao gerar schema do DTO:", error);
+    return generateFallbackSchema(dataType, examples);
   }
 
-  // Se não tiver propriedades no protótipo, usa propriedades comuns baseadas no nome
-  if (Object.keys(properties).length === 0) {
-    const typeName = dataType.name || "Unknown";
+  return {
+    type: "object",
+    properties,
+  };
+}
 
-    // Propriedades padrão que a maioria dos DTOs têm
-    const commonProperties = [
-      "id",
-      "nome",
-      "login",
-      "email",
-      "titulo",
-      "descricao",
-    ];
+/**
+ * Gera schema fallback quando não consegue extrair metadados
+ */
+function generateFallbackSchema(dataType: any, examples?: PropertyExample) {
+  const typeName = dataType.name || "Unknown";
+  const properties: any = {};
+
+  // Para LoginResponseDto especificamente
+  if (typeName.includes("Login")) {
+    properties.token = {
+      type: "string",
+      example: examples?.token || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    };
+    properties.user = {
+      type: "object",
+      properties: {
+        id: { type: "string", example: examples?.user?.id || "user-123" },
+        nome: { type: "string", example: examples?.user?.nome || "João Silva" },
+        login: {
+          type: "string",
+          example: examples?.user?.login || "joao@example.com",
+        },
+        nivel_acesso: {
+          type: "string",
+          example: examples?.user?.nivel_acesso || "DEFAULT",
+        },
+      },
+    };
+  } else {
+    // Propriedades padrão para outros DTOs
+    const commonProperties = ["id", "nome", "login"];
 
     commonProperties.forEach((prop) => {
       properties[prop] = generatePropertySchema(prop, examples);
@@ -123,32 +161,6 @@ function generateDataSchema(dataType: any, examples?: PropertyExample) {
     if (typeName.includes("Response") || typeName.includes("Dto")) {
       properties.criado_em = { type: "string", format: "date-time" };
       properties.alterado_em = { type: "string", format: "date-time" };
-    }
-
-    // Para LoginResponseDto especificamente
-    if (typeName.includes("Login")) {
-      properties.token = {
-        type: "string",
-        example: examples?.token || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-      };
-      properties.user = {
-        type: "object",
-        properties: {
-          id: { type: "string", example: examples?.user?.id || "user-123" },
-          nome: {
-            type: "string",
-            example: examples?.user?.nome || "João Silva",
-          },
-          login: {
-            type: "string",
-            example: examples?.user?.login || "joao@example.com",
-          },
-          nivel_acesso: {
-            type: "string",
-            example: examples?.user?.nivel_acesso || "DEFAULT",
-          },
-        },
-      };
     }
   }
 
