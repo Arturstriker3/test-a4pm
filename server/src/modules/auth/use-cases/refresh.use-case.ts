@@ -48,7 +48,7 @@ export class RefreshUserUseCase {
   private verifyRefreshToken(token: string): JwtPayload {
     const payload = AuthMiddleware.verifyToken(token);
     if (!payload || !payload.userId) {
-      throw new UnauthorizedException("Refresh token inválido ou expirado");
+      throw new UnauthorizedException("Refresh token inválido ou não corresponde ao token armazenado");
     }
     return payload;
   }
@@ -56,7 +56,7 @@ export class RefreshUserUseCase {
   private async getUserByPayload(payload: JwtPayload): Promise<User> {
     const user = await this.usersRepository.findById(payload.userId);
     if (!user) {
-      throw new NotFoundException("Usuário não encontrado");
+      throw new NotFoundException("Usuário não encontrado ou inválido");
     }
     return user;
   }

@@ -49,7 +49,7 @@ export class UserBusinessRules {
   static validateUserForRefresh(user: any): void {
     if (!user) {
       throw new UnauthorizedException(
-        "Usuário não encontrado para o token fornecido"
+        "Usuário não encontrado ou inválido"
       );
     }
   }
