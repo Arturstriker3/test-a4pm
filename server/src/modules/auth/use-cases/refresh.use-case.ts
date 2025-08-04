@@ -61,10 +61,7 @@ export class RefreshUserUseCase {
     return user;
   }
 
-  private async validateStoredRefreshToken(
-    user: User,
-    providedRefreshToken: string
-  ): Promise<void> {
+  private async validateStoredRefreshToken(user: User, providedRefreshToken: string): Promise<void> {
     if (!user.recovery_token) {
       throw new UnauthorizedException(
         "Refresh token inválido ou não corresponde ao token armazenado"
@@ -78,9 +75,7 @@ export class RefreshUserUseCase {
     }
   }
 
-  private async generateTokens(
-    user: User
-  ): Promise<{ token: string; refreshToken: string }> {
+  private async generateTokens(user: User): Promise<{ token: string; refreshToken: string }> {
     const token = AuthMiddleware.generateToken({
       userId: user.id,
       email: user.login,
