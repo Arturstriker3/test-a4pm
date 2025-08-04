@@ -41,4 +41,16 @@ export class UserBusinessRules {
       throw new UnauthorizedException("Email ou senha inválidos");
     }
   }
+
+  /**
+   * Regra de Negócio: Usuário deve existir para refresh token
+   * Retorna mensagem específica pois token já foi validado previamente
+   */
+  static validateUserForRefresh(user: any): void {
+    if (!user) {
+      throw new UnauthorizedException(
+        "Usuário não encontrado para o token fornecido"
+      );
+    }
+  }
 }

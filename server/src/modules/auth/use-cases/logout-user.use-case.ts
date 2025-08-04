@@ -5,7 +5,7 @@ import { UserIdDto } from "@/modules/users/dto/id.dto";
 
 /**
  * Use case responsável por remover o recovery_token do usuário (logout).
- * @param userId - ID do usuário
+ * @param request - ID do usuário
  */
 @injectable()
 export class LogoutUserUseCase {
@@ -14,8 +14,8 @@ export class LogoutUserUseCase {
     private readonly usersRepository: UsersRepository
   ) {}
 
-  async execute(userIdDto: UserIdDto): Promise<boolean> {
-    await this.usersRepository.updateRecoveryToken(userIdDto.id, null);
+  async execute(request: UserIdDto): Promise<boolean> {
+    await this.usersRepository.updateRecoveryToken(request.id, null);
     return true;
   }
 }

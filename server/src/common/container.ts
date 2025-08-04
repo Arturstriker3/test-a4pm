@@ -10,6 +10,7 @@ import { AuthController } from "../modules/auth/auth.controller";
 import { RegisterUserUseCase } from "../modules/auth/use-cases/register-user.use-case";
 import { LoginUserUseCase } from "../modules/auth/use-cases/login-user.use-case";
 import { LogoutUserUseCase } from "../modules/auth/use-cases/logout-user.use-case";
+import { RefreshUserUseCase } from "../modules/auth/use-cases/refresh.use-case";
 
 // Users Module
 import { UsersService } from "../modules/users/users.service";
@@ -44,6 +45,9 @@ container.bind<LoginUserUseCase>(TYPES.LoginUserUseCase).to(LoginUserUseCase);
 container
   .bind<LogoutUserUseCase>(TYPES.LogoutUserUseCase)
   .to(LogoutUserUseCase);
+container
+  .bind<RefreshUserUseCase>(TYPES.RefreshUserUseCase)
+  .to(RefreshUserUseCase);
 
 // Bind Users Module
 container.bind<UsersService>(TYPES.UsersService).to(UsersService);

@@ -8,6 +8,7 @@ export const TYPES = {
   RegisterUserUseCase: Symbol.for("RegisterUserUseCase"),
   LoginUserUseCase: Symbol.for("LoginUserUseCase"),
   LogoutUserUseCase: Symbol.for("LogoutUserUseCase"),
+  RefreshUserUseCase: Symbol.for("RefreshUserUseCase"),
 
   // Users Module
   UsersService: Symbol.for("UsersService"),

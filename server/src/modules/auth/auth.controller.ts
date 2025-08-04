@@ -6,6 +6,8 @@ import {
   RegisterResponseDto,
   LoginDto,
   LoginResponseDto,
+  RefreshTokenDto,
+  TokenResponseDto,
 } from "./dto";
 import {
   RouteAccess,
@@ -78,6 +80,29 @@ export class AuthController {
   async login(loginDto: LoginDto): Promise<ApiResponse<LoginResponseDto>> {
     const response = await this.authService.login(loginDto);
     return ApiResponse.success(response, "Login realizado com sucesso");
+  }
+
+  @Post("/refresh")
+  @RouteAccess(RouteAccessType.PUBLIC)
+  @ApiOperation({
+    summary: "Troca de token",
+    description:
+      "Recebe um refresh token válido e retorna um novo access token e refresh token.",
+  })
+  @ApiBody({
+    type: RefreshTokenDto,
+    description: "Payload contendo o refresh token.",
+  })
+  @ApiSuccessResponse({
+    description: "Tokens trocados com sucesso",
+    dataType: TokenResponseDto,
+  })
+  @ApiUnauthorizedResponse({
+    messageExample: "Refresh token inválido ou expirado",
+  })
+  async refresh(refreshTokenDto: RefreshTokenDto): Promise<ApiResponse<TokenResponseDto>> {
+    const response = await this.authService.refreshToken(refreshTokenDto);
+    return ApiResponse.success(response, "Tokens atualizados com sucesso");
   }
 
   @Post("/logout/:id")
