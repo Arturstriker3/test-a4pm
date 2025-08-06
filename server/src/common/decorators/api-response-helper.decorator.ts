@@ -31,8 +31,7 @@ function generateResponseSchema(
   messageExample?: string
 ) {
   const isSuccessStatus = status >= 200 && status < 300;
-  const defaultMessage =
-    HttpMessages[status as keyof typeof HttpMessages] || `Status ${status}`;
+  const defaultMessage = HttpMessages[status as keyof typeof HttpMessages] || `Status ${status}`;
 
   const schema: any = {
     type: "object",
@@ -74,8 +73,7 @@ function generateDataSchema(dataType: any, examples?: PropertyExample) {
     const instance = new dataType({});
 
     // Lê os metadados do @SchemaProperty
-    const schemaMetadata =
-      Reflect.getMetadata(SCHEMA_PROPERTY_METADATA, instance) || {};
+    const schemaMetadata = Reflect.getMetadata(SCHEMA_PROPERTY_METADATA, instance) || {};
 
     // Pega todas as propriedades da instância
     const propertyKeys = Object.keys(instance);
@@ -173,10 +171,7 @@ function generateFallbackSchema(dataType: any, examples?: PropertyExample) {
 /**
  * Gera o schema de uma propriedade específica
  */
-function generatePropertySchema(
-  propertyName: string,
-  examples?: PropertyExample
-) {
+function generatePropertySchema(propertyName: string, examples?: PropertyExample) {
   const example = examples?.[propertyName];
 
   // Mapeia tipos baseado no nome da propriedade
@@ -223,137 +218,61 @@ function generatePropertySchema(
 /**
  * Decorator para resposta de sucesso (200)
  */
-export function ApiSuccessResponse<T>(
-  config: Omit<ApiResponseConfig<T>, "status">
-) {
+export function ApiSuccessResponse<T>(config: Omit<ApiResponseConfig<T>, "status">) {
   return ApiResponseDoc(
-    generateResponseSchema(
-      200,
-      config.description,
-      config.dataType,
-      config.examples,
-      config.messageExample
-    )
+    generateResponseSchema(200, config.description, config.dataType, config.examples, config.messageExample)
   );
 }
 
 /**
  * Decorator para resposta de criação (201)
  */
-export function ApiCreatedResponse<T>(
-  config: Omit<ApiResponseConfig<T>, "status">
-) {
+export function ApiCreatedResponse<T>(config: Omit<ApiResponseConfig<T>, "status">) {
   return ApiResponseDoc(
-    generateResponseSchema(
-      201,
-      config.description,
-      config.dataType,
-      config.examples,
-      config.messageExample
-    )
+    generateResponseSchema(201, config.description, config.dataType, config.examples, config.messageExample)
   );
 }
 
 /**
  * Decorator para resposta sem conteúdo (204)
  */
-export function ApiNoContentResponse(
-  config?: Omit<ApiResponseConfig<never>, "status" | "dataType">
-) {
-  return ApiResponseDoc(
-    generateResponseSchema(
-      204,
-      config?.description,
-      undefined,
-      undefined,
-      config?.messageExample
-    )
-  );
+export function ApiNoContentResponse(config?: Omit<ApiResponseConfig<never>, "status" | "dataType">) {
+  return ApiResponseDoc(generateResponseSchema(204, config?.description, undefined, undefined, config?.messageExample));
 }
 
 /**
  * Decorator para resposta de erro de validação (400)
  */
-export function ApiBadRequestResponse(
-  config?: Omit<ApiResponseConfig<never>, "status" | "dataType">
-) {
-  return ApiResponseDoc(
-    generateResponseSchema(
-      400,
-      config?.description,
-      undefined,
-      undefined,
-      config?.messageExample
-    )
-  );
+export function ApiBadRequestResponse(config?: Omit<ApiResponseConfig<never>, "status" | "dataType">) {
+  return ApiResponseDoc(generateResponseSchema(400, config?.description, undefined, undefined, config?.messageExample));
 }
 
 /**
  * Decorator para resposta de não autorizado (401)
  */
-export function ApiUnauthorizedResponse(
-  config?: Omit<ApiResponseConfig<never>, "status" | "dataType">
-) {
-  return ApiResponseDoc(
-    generateResponseSchema(
-      401,
-      config?.description,
-      undefined,
-      undefined,
-      config?.messageExample
-    )
-  );
+export function ApiUnauthorizedResponse(config?: Omit<ApiResponseConfig<never>, "status" | "dataType">) {
+  return ApiResponseDoc(generateResponseSchema(401, config?.description, undefined, undefined, config?.messageExample));
 }
 
 /**
  * Decorator para resposta de acesso negado (403)
  */
-export function ApiForbiddenResponse(
-  config?: Omit<ApiResponseConfig<never>, "status" | "dataType">
-) {
-  return ApiResponseDoc(
-    generateResponseSchema(
-      403,
-      config?.description,
-      undefined,
-      undefined,
-      config?.messageExample
-    )
-  );
+export function ApiForbiddenResponse(config?: Omit<ApiResponseConfig<never>, "status" | "dataType">) {
+  return ApiResponseDoc(generateResponseSchema(403, config?.description, undefined, undefined, config?.messageExample));
 }
 
 /**
  * Decorator para resposta de não encontrado (404)
  */
-export function ApiNotFoundResponse(
-  config?: Omit<ApiResponseConfig<never>, "status" | "dataType">
-) {
-  return ApiResponseDoc(
-    generateResponseSchema(
-      404,
-      config?.description,
-      undefined,
-      undefined,
-      config?.messageExample
-    )
-  );
+export function ApiNotFoundResponse(config?: Omit<ApiResponseConfig<never>, "status" | "dataType">) {
+  return ApiResponseDoc(generateResponseSchema(404, config?.description, undefined, undefined, config?.messageExample));
 }
 
 /**
  * Decorator para resposta de conflito (409)
  */
-export function ApiConflictResponse(
-  config?: Omit<ApiResponseConfig<never>, "status" | "dataType">
-) {
-  return ApiResponseDoc(
-    generateResponseSchema(
-      409,
-      config?.description,
-      undefined,
-      undefined,
-      config?.messageExample
-    )
-  );
+export function ApiConflictResponse(config?: Omit<ApiResponseConfig<never>, "status" | "dataType">) {
+  return ApiResponseDoc(generateResponseSchema(409, config?.description, undefined, undefined, config?.messageExample));
 }
 
 /**
@@ -361,12 +280,6 @@ export function ApiConflictResponse(
  */
 export function ApiCustomResponse<T>(config: ApiResponseConfig<T>) {
   return ApiResponseDoc(
-    generateResponseSchema(
-      config.status,
-      config.description,
-      config.dataType,
-      config.examples,
-      config.messageExample
-    )
+    generateResponseSchema(config.status, config.description, config.dataType, config.examples, config.messageExample)
   );
 }

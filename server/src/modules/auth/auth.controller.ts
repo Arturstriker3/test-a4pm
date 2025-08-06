@@ -1,19 +1,8 @@
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../common/types";
 import { AuthService } from "./auth.service";
-import {
-  RegisterDto,
-  RegisterResponseDto,
-  LoginDto,
-  LoginResponseDto,
-  RefreshTokenDto,
-  TokenResponseDto,
-} from "./dto";
-import {
-  RouteAccess,
-  AccessTo,
-  RouteAccessType,
-} from "./decorators/access.decorators";
+import { RegisterDto, RegisterResponseDto, LoginDto, LoginResponseDto, RefreshTokenDto, TokenResponseDto } from "./dto";
+import { RouteAccess, AccessTo, RouteAccessType } from "./decorators/access.decorators";
 import { Controller, Post, Param } from "../../common/decorators";
 import { ApiResponse } from "../../common/responses";
 import {
@@ -31,9 +20,7 @@ import { UserIdDto } from "../users/dto/id.dto";
 @Controller("/auth")
 @HandleClassExceptions
 export class AuthController {
-  constructor(
-    @inject(TYPES.AuthService) private readonly authService: AuthService
-  ) {}
+  constructor(@inject(TYPES.AuthService) private readonly authService: AuthService) {}
 
   @Post("/register")
   @RouteAccess(RouteAccessType.PUBLIC)
@@ -52,9 +39,7 @@ export class AuthController {
   @ApiBadRequestResponse({
     messageExample: "Email já está em uso",
   })
-  async register(
-    registerDto: RegisterDto
-  ): Promise<ApiResponse<RegisterResponseDto>> {
+  async register(registerDto: RegisterDto): Promise<ApiResponse<RegisterResponseDto>> {
     const response = await this.authService.register(registerDto);
     return ApiResponse.created(response, "Usuário criado com sucesso");
   }
@@ -63,8 +48,7 @@ export class AuthController {
   @RouteAccess(RouteAccessType.PUBLIC)
   @ApiOperation({
     summary: "Fazer login",
-    description:
-      "Autentica um usuário e retorna um token JWT para acesso às rotas protegidas.",
+    description: "Autentica um usuário e retorna um token JWT para acesso às rotas protegidas.",
   })
   @ApiBody({
     type: LoginDto,
@@ -86,8 +70,7 @@ export class AuthController {
   @RouteAccess(RouteAccessType.PUBLIC)
   @ApiOperation({
     summary: "Troca de token",
-    description:
-      "Recebe um refresh token válido e retorna um novo access token e refresh token.",
+    description: "Recebe um refresh token válido e retorna um novo access token e refresh token.",
   })
   @ApiBody({
     type: RefreshTokenDto,

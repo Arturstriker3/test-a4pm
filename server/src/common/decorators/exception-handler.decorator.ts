@@ -5,11 +5,7 @@ import { ApiResponse } from "../responses";
  * Decorator para automatizar o tratamento de exceções nos controllers
  * Similar ao @UseFilters() do NestJS
  */
-export function HandleExceptions(
-  target: any,
-  propertyKey: string,
-  descriptor: PropertyDescriptor
-) {
+export function HandleExceptions(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value;
 
   descriptor.value = async function (...args: any[]) {
@@ -27,14 +23,10 @@ export function HandleExceptions(
 /**
  * Decorator para aplicar em toda a classe
  */
-export function HandleClassExceptions<T extends { new (...args: any[]): {} }>(
-  constructor: T
-) {
+export function HandleClassExceptions<T extends { new (...args: any[]): {} }>(constructor: T) {
   // Pegar todos os métodos da classe
   const methodNames = Object.getOwnPropertyNames(constructor.prototype).filter(
-    (name) =>
-      name !== "constructor" &&
-      typeof constructor.prototype[name] === "function"
+    (name) => name !== "constructor" && typeof constructor.prototype[name] === "function"
   );
 
   // Aplicar o tratamento de exceções em todos os métodos

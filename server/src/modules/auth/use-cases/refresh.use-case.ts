@@ -3,10 +3,7 @@ import { TYPES } from "../../../common/types";
 import { UsersRepository } from "../../users/users.repository";
 import { UserBusinessRules } from "../../users/rules/user.rules";
 import { RefreshTokenDto } from "../dto";
-import {
-  UnauthorizedException,
-  NotFoundException,
-} from "../../../common/exceptions/app-exceptions";
+import { UnauthorizedException, NotFoundException } from "../../../common/exceptions/app-exceptions";
 import { AuthMiddleware, JwtPayload } from "../../../common/middlewares";
 import { TokenResponseDto } from "../dto";
 import { User } from "../../users/entities/user.entity";
@@ -63,15 +60,11 @@ export class RefreshUserUseCase {
 
   private async validateStoredRefreshToken(user: User, providedRefreshToken: string): Promise<void> {
     if (!user.recovery_token) {
-      throw new UnauthorizedException(
-        "Refresh token inválido ou não corresponde ao token armazenado"
-      );
+      throw new UnauthorizedException("Refresh token inválido ou não corresponde ao token armazenado");
     }
 
     if (user.recovery_token !== providedRefreshToken) {
-      throw new UnauthorizedException(
-        "Refresh token inválido ou não corresponde ao token armazenado"
-      );
+      throw new UnauthorizedException("Refresh token inválido ou não corresponde ao token armazenado");
     }
   }
 

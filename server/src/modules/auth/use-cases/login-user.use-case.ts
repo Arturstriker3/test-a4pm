@@ -30,10 +30,7 @@ export class LoginUserUseCase {
 
     const validUser = user!;
 
-    const isPasswordValid = await this.verifyPassword(
-      request.senha,
-      validUser.senha
-    );
+    const isPasswordValid = await this.verifyPassword(request.senha, validUser.senha);
 
     UserBusinessRules.validatePasswordMatch(isPasswordValid);
 
@@ -59,10 +56,7 @@ export class LoginUserUseCase {
     });
   }
 
-  private async verifyPassword(
-    plainPassword: string,
-    hashedPassword: string
-  ): Promise<boolean> {
+  private async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 }

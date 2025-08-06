@@ -94,13 +94,8 @@ export class ApiResponse<T = any> {
   /**
    * Criar uma resposta com código HTTP personalizado
    */
-  static custom<T>(
-    code: number,
-    data: T | null = null,
-    message?: string
-  ): ApiResponse<T> {
-    const defaultMessage =
-      HttpMessages[code as keyof typeof HttpMessages] || `Status ${code}`;
+  static custom<T>(code: number, data: T | null = null, message?: string): ApiResponse<T> {
+    const defaultMessage = HttpMessages[code as keyof typeof HttpMessages] || `Status ${code}`;
     return new ApiResponse(code, message || defaultMessage, data);
   }
 

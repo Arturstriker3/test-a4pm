@@ -36,11 +36,7 @@ export function Controller(prefix: string = "") {
  * @param path - Caminho da rota (ex: "/", "/:id")
  */
 export function Get(path: string = "") {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     setRouteMetadata(target, propertyKey, HttpMethod.GET, path);
     return descriptor;
   };
@@ -51,11 +47,7 @@ export function Get(path: string = "") {
  * @param path - Caminho da rota (ex: "/", "/create")
  */
 export function Post(path: string = "") {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     setRouteMetadata(target, propertyKey, HttpMethod.POST, path);
     return descriptor;
   };
@@ -66,11 +58,7 @@ export function Post(path: string = "") {
  * @param path - Caminho da rota (ex: "/:id")
  */
 export function Put(path: string = "") {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     setRouteMetadata(target, propertyKey, HttpMethod.PUT, path);
     return descriptor;
   };
@@ -81,11 +69,7 @@ export function Put(path: string = "") {
  * @param path - Caminho da rota (ex: "/:id")
  */
 export function Patch(path: string = "") {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     setRouteMetadata(target, propertyKey, HttpMethod.PATCH, path);
     return descriptor;
   };
@@ -96,11 +80,7 @@ export function Patch(path: string = "") {
  * @param path - Caminho da rota (ex: "/:id")
  */
 export function Delete(path: string = "") {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     setRouteMetadata(target, propertyKey, HttpMethod.DELETE, path);
     return descriptor;
   };
@@ -109,14 +89,8 @@ export function Delete(path: string = "") {
 /**
  * Função auxiliar para definir metadados da rota
  */
-function setRouteMetadata(
-  target: any,
-  propertyKey: string,
-  method: HttpMethod,
-  path: string
-) {
-  const existingRoutes: RouteMetadata[] =
-    Reflect.getMetadata(ROUTE_METADATA_KEY, target.constructor) || [];
+function setRouteMetadata(target: any, propertyKey: string, method: HttpMethod, path: string) {
+  const existingRoutes: RouteMetadata[] = Reflect.getMetadata(ROUTE_METADATA_KEY, target.constructor) || [];
 
   const routeMetadata: RouteMetadata = {
     method,
@@ -125,11 +99,7 @@ function setRouteMetadata(
   };
 
   existingRoutes.push(routeMetadata);
-  Reflect.defineMetadata(
-    ROUTE_METADATA_KEY,
-    existingRoutes,
-    target.constructor
-  );
+  Reflect.defineMetadata(ROUTE_METADATA_KEY, existingRoutes, target.constructor);
 }
 
 /**

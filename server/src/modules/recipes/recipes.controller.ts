@@ -2,11 +2,7 @@ import { injectable, inject } from "inversify";
 import { TYPES } from "../../common/types";
 import { RecipesService } from "./recipes.service";
 import { Controller, Get, Post, Put, Delete } from "../../common/decorators";
-import {
-  RouteAccess,
-  AccessTo,
-  RouteAccessType,
-} from "../auth/decorators/access.decorators";
+import { RouteAccess, AccessTo, RouteAccessType } from "../auth/decorators/access.decorators";
 import { UserRole } from "../users/entities/user.entity";
 import { ApiResponse } from "../../common/responses";
 import { CreateRecipeDto, UpdateRecipeDto } from "./dto/recipe.dto";
@@ -30,10 +26,7 @@ export class RecipesController {
   @RouteAccess(RouteAccessType.PUBLIC)
   async findById(params: { id: string }): Promise<ApiResponse<any>> {
     // TODO: Implementar busca por ID
-    return ApiResponse.success(
-      { id: params.id, nome: "Receita" },
-      "Receita encontrada"
-    );
+    return ApiResponse.success({ id: params.id, nome: "Receita" }, "Receita encontrada");
   }
 
   @Post("/")
@@ -45,15 +38,9 @@ export class RecipesController {
 
   @Put("/:id")
   @RouteAccess(RouteAccessType.AUTHENTICATED)
-  async update(
-    params: { id: string },
-    recipeDto: UpdateRecipeDto
-  ): Promise<ApiResponse<any>> {
+  async update(params: { id: string }, recipeDto: UpdateRecipeDto): Promise<ApiResponse<any>> {
     // TODO: Implementar atualização de receita
-    return ApiResponse.success(
-      { ...recipeDto, id: params.id },
-      "Receita atualizada com sucesso"
-    );
+    return ApiResponse.success({ ...recipeDto, id: params.id }, "Receita atualizada com sucesso");
   }
 
   @Delete("/:id")

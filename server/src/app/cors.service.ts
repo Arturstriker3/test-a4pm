@@ -45,13 +45,7 @@ export async function setupCors(app: FastifyInstance): Promise<void> {
     origin: config.origin,
     credentials: config.credentials,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Requested-With",
-      "Accept",
-      "Origin",
-    ],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
   });
 
   console.log("🌐 CORS configured with:");

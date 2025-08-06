@@ -22,9 +22,7 @@ export class ParamValidator {
     if (errors.length > 0) {
       // Pega a primeira mensagem de erro
       const firstError = errors[0];
-      const message =
-        Object.values(firstError.constraints || {})[0] ||
-        "Erro de validação de parâmetros";
+      const message = Object.values(firstError.constraints || {})[0] || "Erro de validação de parâmetros";
       throw new ValidationException(message);
     }
 
@@ -37,8 +35,7 @@ export class ParamValidator {
    * @param fieldName - Nome do campo para mensagem de erro
    */
   static validateUUID(id: string, fieldName: string = "ID"): void {
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(id)) {
       throw new ValidationException(`${fieldName} deve ser um UUID válido`);
     }

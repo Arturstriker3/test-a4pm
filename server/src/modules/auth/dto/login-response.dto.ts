@@ -44,13 +44,7 @@ export class LoginResponseDto {
   })
   role!: UserRole;
 
-  constructor(data: {
-    token: string;
-    userId: string;
-    nome: string;
-    email: string;
-    role: UserRole;
-  }) {
+  constructor(data: { token: string; userId: string; nome: string; email: string; role: UserRole }) {
     this.token = data.token;
     this.userId = data.userId;
     this.nome = data.nome;

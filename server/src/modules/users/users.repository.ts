@@ -92,10 +92,7 @@ export class UsersRepository {
     };
   }
 
-  async updateRecoveryToken(
-    userId: string,
-    recoveryToken: string | null
-  ): Promise<void> {
+  async updateRecoveryToken(userId: string, recoveryToken: string | null): Promise<void> {
     const connection = await this.databaseService.getConnection();
 
     const query = `

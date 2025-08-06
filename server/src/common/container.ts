@@ -16,6 +16,8 @@ import { RefreshUserUseCase } from "../modules/auth/use-cases/refresh.use-case";
 import { UsersService } from "../modules/users/users.service";
 import { UsersController } from "../modules/users/users.controller";
 import { UsersRepository } from "../modules/users/users.repository";
+import { GetUserByTokenUseCase } from "../modules/users/use-cases/get-user-by-token.use-case";
+import { GetUserByIdUseCase } from "../modules/users/use-cases/get-user-by-id.use-case";
 
 // Categories Module
 import { CategoriesService } from "../modules/categories/categories.service";
@@ -30,48 +32,31 @@ import { RecipesRepository } from "../modules/recipes/recipes.repository";
 const container = new Container();
 
 // Bind Database
-container
-  .bind<DatabaseService>(TYPES.DatabaseService)
-  .to(DatabaseService)
-  .inSingletonScope();
+container.bind<DatabaseService>(TYPES.DatabaseService).to(DatabaseService).inSingletonScope();
 
 // Bind Auth Module
 container.bind<AuthService>(TYPES.AuthService).to(AuthService);
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
-container
-  .bind<RegisterUserUseCase>(TYPES.RegisterUserUseCase)
-  .to(RegisterUserUseCase);
+container.bind<RegisterUserUseCase>(TYPES.RegisterUserUseCase).to(RegisterUserUseCase);
 container.bind<LoginUserUseCase>(TYPES.LoginUserUseCase).to(LoginUserUseCase);
-container
-  .bind<LogoutUserUseCase>(TYPES.LogoutUserUseCase)
-  .to(LogoutUserUseCase);
-container
-  .bind<RefreshUserUseCase>(TYPES.RefreshUserUseCase)
-  .to(RefreshUserUseCase);
+container.bind<LogoutUserUseCase>(TYPES.LogoutUserUseCase).to(LogoutUserUseCase);
+container.bind<RefreshUserUseCase>(TYPES.RefreshUserUseCase).to(RefreshUserUseCase);
 
 // Bind Users Module
+container.bind<UsersRepository>(TYPES.UsersRepository).to(UsersRepository);
+container.bind<GetUserByIdUseCase>(TYPES.GetUserByIdUseCase).to(GetUserByIdUseCase);
+// container.bind<GetUserByTokenUseCase>(TYPES.GetUserByTokenUseCase).to(GetUserByTokenUseCase);
 container.bind<UsersService>(TYPES.UsersService).to(UsersService);
 container.bind<UsersController>(TYPES.UsersController).to(UsersController);
-container.bind<UsersRepository>(TYPES.UsersRepository).to(UsersRepository);
 
 // Bind Categories Module
-container
-  .bind<CategoriesService>(TYPES.CategoriesService)
-  .to(CategoriesService);
-container
-  .bind<CategoriesController>(TYPES.CategoriesController)
-  .to(CategoriesController);
-container
-  .bind<CategoriesRepository>(TYPES.CategoriesRepository)
-  .to(CategoriesRepository);
+container.bind<CategoriesService>(TYPES.CategoriesService).to(CategoriesService);
+container.bind<CategoriesController>(TYPES.CategoriesController).to(CategoriesController);
+container.bind<CategoriesRepository>(TYPES.CategoriesRepository).to(CategoriesRepository);
 
 // Bind Recipes Module
 container.bind<RecipesService>(TYPES.RecipesService).to(RecipesService);
-container
-  .bind<RecipesController>(TYPES.RecipesController)
-  .to(RecipesController);
-container
-  .bind<RecipesRepository>(TYPES.RecipesRepository)
-  .to(RecipesRepository);
+container.bind<RecipesController>(TYPES.RecipesController).to(RecipesController);
+container.bind<RecipesRepository>(TYPES.RecipesRepository).to(RecipesRepository);
 
 export { container };

@@ -29,9 +29,7 @@ async function runMigrationCommand() {
         const migrationName = args[1];
         if (!migrationName) {
           console.error("❌ Migration name is required");
-          console.log(
-            "Usage: tsx src/migrations/cli.ts create <migration-name>"
-          );
+          console.log("Usage: tsx src/migrations/cli.ts create <migration-name>");
           process.exit(1);
         }
         await createMigrationFile(migrationName);
@@ -56,10 +54,7 @@ async function runMigrationCommand() {
 
 async function createMigrationFile(name: string): Promise<void> {
   const timestamp = Date.now();
-  const fileName = `${timestamp}_${name.replace(
-    /[^a-zA-Z0-9]/g,
-    "_"
-  )}.migration.ts`;
+  const fileName = `${timestamp}_${name.replace(/[^a-zA-Z0-9]/g, "_")}.migration.ts`;
   const filePath = `${__dirname}/files/${fileName}`;
 
   const template = `import { Connection } from "mysql2/promise";

@@ -1,14 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import {
-  AuthMiddleware,
-  AuthenticatedRequest,
-  JwtPayload,
-} from "./auth.middleware";
-import {
-  ROUTE_ACCESS_KEY,
-  ACCESS_TO_KEY,
-  RouteAccessType,
-} from "../../modules/auth/decorators/access.decorators";
+import { AuthMiddleware, AuthenticatedRequest, JwtPayload } from "./auth.middleware";
+import { ROUTE_ACCESS_KEY, ACCESS_TO_KEY, RouteAccessType } from "../../modules/auth/decorators/access.decorators";
 
 /**
  * Middleware que integra a autenticação JWT com os decoradores de acesso
@@ -25,16 +17,8 @@ export class RouteAuthMiddleware {
     methodName: string
   ): Promise<void> {
     // Obter metadados dos decoradores
-    const accessType = Reflect.getMetadata(
-      ROUTE_ACCESS_KEY,
-      target,
-      methodName
-    ) as RouteAccessType;
-    const requiredRoles = Reflect.getMetadata(
-      ACCESS_TO_KEY,
-      target,
-      methodName
-    ) as string[];
+    const accessType = Reflect.getMetadata(ROUTE_ACCESS_KEY, target, methodName) as RouteAccessType;
+    const requiredRoles = Reflect.getMetadata(ACCESS_TO_KEY, target, methodName) as string[];
 
     // Se é rota pública, não precisa de autenticação
     if (accessType === RouteAccessType.PUBLIC) {

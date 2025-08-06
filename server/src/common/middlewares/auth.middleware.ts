@@ -24,10 +24,7 @@ export class AuthMiddleware {
   /**
    * Middleware principal de autenticação
    */
-  static async authenticate(
-    request: FastifyRequest,
-    reply: FastifyReply
-  ): Promise<void> {
+  static async authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     try {
       const token = AuthMiddleware.extractTokenFromHeader(request);
 
@@ -39,10 +36,7 @@ export class AuthMiddleware {
         throw new Error("JWT_SECRET não configurado nas variáveis de ambiente");
       }
 
-      const decoded = jwt.verify(
-        token,
-        AuthMiddleware.JWT_SECRET
-      ) as JwtPayload;
+      const decoded = jwt.verify(token, AuthMiddleware.JWT_SECRET) as JwtPayload;
 
       // Adiciona os dados do usuário à requisição
       (request as AuthenticatedRequest).user = decoded;
@@ -61,10 +55,7 @@ export class AuthMiddleware {
    * Middleware para verificar se o usuário tem uma role específica
    */
   static requireRole(requiredRole: string) {
-    return async (
-      request: FastifyRequest,
-      reply: FastifyReply
-    ): Promise<void> => {
+    return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
       const authenticatedRequest = request as AuthenticatedRequest;
 
       if (!authenticatedRequest.user) {
@@ -72,9 +63,7 @@ export class AuthMiddleware {
       }
 
       if (authenticatedRequest.user.role !== requiredRole) {
-        throw new UnauthorizedException(
-          `Acesso negado. Role '${requiredRole}' requerida`
-        );
+        throw new UnauthorizedException(`Acesso negado. Role '${requiredRole}' requerida`);
       }
     };
   }
@@ -83,10 +72,7 @@ export class AuthMiddleware {
    * Middleware para verificar se o usuário tem pelo menos uma das roles fornecidas
    */
   static requireAnyRole(allowedRoles: string[]) {
-    return async (
-      request: FastifyRequest,
-      reply: FastifyReply
-    ): Promise<void> => {
+    return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
       const authenticatedRequest = request as AuthenticatedRequest;
 
       if (!authenticatedRequest.user) {
@@ -95,9 +81,7 @@ export class AuthMiddleware {
 
       if (!allowedRoles.includes(authenticatedRequest.user.role)) {
         throw new UnauthorizedException(
-          `Acesso negado. Uma das seguintes roles é requerida: ${allowedRoles.join(
-            ", "
-          )}`
+          `Acesso negado. Uma das seguintes roles é requerida: ${allowedRoles.join(", ")}`
         );
       }
     };
@@ -106,9 +90,7 @@ export class AuthMiddleware {
   /**
    * Extrai o token do header Authorization
    */
-  private static extractTokenFromHeader(
-    request: FastifyRequest
-  ): string | null {
+  private static extractTokenFromHeader(request: FastifyRequest): string | null {
     const authHeader = request.headers.authorization;
 
     if (!authHeader) {
@@ -143,10 +125,7 @@ export class AuthMiddleware {
   /**
    * Gera um token de recuperação de senha (tempo de vida menor)
    */
-  static generateRecoveryToken(payload: {
-    userId: string;
-    email: string;
-  }): string {
+  static generateRecoveryToken(payload: { userId: string; email: string }): string {
     const secret = AuthMiddleware.JWT_SECRET;
     if (!secret) {
       throw new Error("JWT_SECRET não configurado nas variáveis de ambiente");

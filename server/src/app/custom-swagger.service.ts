@@ -4,10 +4,7 @@ import swaggerJsdoc from "swagger-jsdoc";
 import { networkInterfaces } from "os";
 import { container } from "../common/container";
 import { TYPES } from "../common/types";
-import {
-  getMethodMetadata,
-  SWAGGER_METADATA,
-} from "../common/decorators/swagger.decorators";
+import { getMethodMetadata, SWAGGER_METADATA } from "../common/decorators/swagger.decorators";
 import { getSchemaFromDto } from "../common/decorators/schema.decorators";
 
 /**
@@ -149,14 +146,8 @@ export class CustomSwaggerService {
     // Importar dependências necessárias
     const { container } = require("../common/container");
     const { TYPES } = require("../common/types");
-    const {
-      getRouteMetadata,
-      getControllerPrefix,
-    } = require("../common/decorators/route.decorators");
-    const {
-      getRouteAccess,
-      RouteAccessType,
-    } = require("../modules/auth/decorators/access.decorators");
+    const { getRouteMetadata, getControllerPrefix } = require("../common/decorators/route.decorators");
+    const { getRouteAccess, RouteAccessType } = require("../modules/auth/decorators/access.decorators");
 
     // Mapeamento dos controllers disponíveis
     const CONTROLLERS = {
@@ -166,9 +157,7 @@ export class CustomSwaggerService {
       RecipesController: TYPES.RecipesController,
     };
 
-    for (const [controllerName, controllerType] of Object.entries(
-      CONTROLLERS
-    )) {
+    for (const [controllerName, controllerType] of Object.entries(CONTROLLERS)) {
       try {
         // Obtém o controller do container
         const controller = container.get(controllerType as any) as any;
@@ -204,13 +193,8 @@ export class CustomSwaggerService {
           }
 
           const pathItem: any = {
-            tags:
-              metadata.tags.length > 0
-                ? metadata.tags
-                : [controllerName.replace("Controller", "")],
-            summary:
-              metadata.operation?.summary ||
-              `${route.method.toUpperCase()} ${swaggerPath}`,
+            tags: metadata.tags.length > 0 ? metadata.tags : [controllerName.replace("Controller", "")],
+            summary: metadata.operation?.summary || `${route.method.toUpperCase()} ${swaggerPath}`,
             description: metadata.operation?.description || "",
             responses: this.processResponses(metadata.responses),
           };

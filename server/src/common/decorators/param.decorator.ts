@@ -17,13 +17,8 @@ export interface ParamMetadata {
  * @param dtoClass - Classe DTO para validação (opcional)
  */
 export function Param(paramName: string, dtoClass?: new () => any) {
-  return function (
-    target: any,
-    propertyKey: string | symbol,
-    parameterIndex: number
-  ) {
-    const existingParams: ParamMetadata[] =
-      Reflect.getMetadata(PARAM_METADATA_KEY, target, propertyKey) || [];
+  return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
+    const existingParams: ParamMetadata[] = Reflect.getMetadata(PARAM_METADATA_KEY, target, propertyKey) || [];
 
     const paramMetadata: ParamMetadata = {
       index: parameterIndex,
@@ -33,21 +28,13 @@ export function Param(paramName: string, dtoClass?: new () => any) {
 
     existingParams.push(paramMetadata);
 
-    Reflect.defineMetadata(
-      PARAM_METADATA_KEY,
-      existingParams,
-      target,
-      propertyKey
-    );
+    Reflect.defineMetadata(PARAM_METADATA_KEY, existingParams, target, propertyKey);
   };
 }
 
 /**
  * Função helper para obter metadados dos parâmetros
  */
-export function getParamMetadata(
-  target: any,
-  propertyKey: string
-): ParamMetadata[] {
+export function getParamMetadata(target: any, propertyKey: string): ParamMetadata[] {
   return Reflect.getMetadata(PARAM_METADATA_KEY, target, propertyKey) || [];
 }

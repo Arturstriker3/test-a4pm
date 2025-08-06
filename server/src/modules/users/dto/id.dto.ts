@@ -2,8 +2,7 @@ import { IsUUID } from "class-validator";
 import { SchemaProperty, SchemaClass } from "../../../common/decorators";
 
 @SchemaClass({
-  description:
-    "DTO contendo o ID do usuário para operações que exigem identificação.",
+  description: "DTO contendo o ID do usuário para operações que exigem identificação.",
 })
 export class UserIdDto {
   @IsUUID()

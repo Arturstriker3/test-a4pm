@@ -36,31 +36,16 @@ export interface ApiTagOptions {
 
 // Decorator para operações
 export function ApiOperation(options: ApiOperationOptions) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    Reflect.defineMetadata(
-      SWAGGER_METADATA.API_OPERATION,
-      options,
-      target,
-      propertyKey
-    );
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    Reflect.defineMetadata(SWAGGER_METADATA.API_OPERATION, options, target, propertyKey);
     return descriptor;
   };
 }
 
 // Decorator para respostas
 export function ApiResponse(options: ApiResponseOptions) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const existingResponses =
-      Reflect.getMetadata(SWAGGER_METADATA.API_RESPONSE, target, propertyKey) ||
-      [];
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const existingResponses = Reflect.getMetadata(SWAGGER_METADATA.API_RESPONSE, target, propertyKey) || [];
 
     // Se um tipo DTO foi fornecido, gera o schema automaticamente
     if (options.type && !options.schema) {
@@ -73,23 +58,14 @@ export function ApiResponse(options: ApiResponseOptions) {
     }
 
     existingResponses.push(options);
-    Reflect.defineMetadata(
-      SWAGGER_METADATA.API_RESPONSE,
-      existingResponses,
-      target,
-      propertyKey
-    );
+    Reflect.defineMetadata(SWAGGER_METADATA.API_RESPONSE, existingResponses, target, propertyKey);
     return descriptor;
   };
 }
 
 // Decorator para body
 export function ApiBody(options: ApiBodyOptions) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     // Se um tipo DTO foi fornecido, gera o schema automaticamente
     if (options.type && !options.schema) {
       try {
@@ -100,12 +76,7 @@ export function ApiBody(options: ApiBodyOptions) {
       }
     }
 
-    Reflect.defineMetadata(
-      SWAGGER_METADATA.API_BODY,
-      options,
-      target,
-      propertyKey
-    );
+    Reflect.defineMetadata(SWAGGER_METADATA.API_BODY, options, target, propertyKey);
     return descriptor;
   };
 }
@@ -120,21 +91,10 @@ export function ApiTags(...tags: string[]) {
 
 // Função para extrair metadata de um método
 export function getMethodMetadata(target: any, propertyKey: string) {
-  const operation = Reflect.getMetadata(
-    SWAGGER_METADATA.API_OPERATION,
-    target,
-    propertyKey
-  );
-  const responses =
-    Reflect.getMetadata(SWAGGER_METADATA.API_RESPONSE, target, propertyKey) ||
-    [];
-  const body = Reflect.getMetadata(
-    SWAGGER_METADATA.API_BODY,
-    target,
-    propertyKey
-  );
-  const classTags =
-    Reflect.getMetadata(SWAGGER_METADATA.API_TAG, target.constructor) || [];
+  const operation = Reflect.getMetadata(SWAGGER_METADATA.API_OPERATION, target, propertyKey);
+  const responses = Reflect.getMetadata(SWAGGER_METADATA.API_RESPONSE, target, propertyKey) || [];
+  const body = Reflect.getMetadata(SWAGGER_METADATA.API_BODY, target, propertyKey);
+  const classTags = Reflect.getMetadata(SWAGGER_METADATA.API_TAG, target.constructor) || [];
 
   return {
     operation,

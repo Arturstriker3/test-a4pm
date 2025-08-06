@@ -38,19 +38,14 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function connectWithRetry(
-  maxRetries: number = 5,
-  delay: number = 2000
-): Promise<void> {
+async function connectWithRetry(maxRetries: number = 5, delay: number = 2000): Promise<void> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       await testDatabaseConnection();
       console.log("✅ Database connected");
       return;
     } catch (error) {
-      console.log(
-        `⚠️  Database connection attempt ${attempt}/${maxRetries} failed`
-      );
+      console.log(`⚠️  Database connection attempt ${attempt}/${maxRetries} failed`);
 
       if (attempt === maxRetries) {
         console.error("❌ Failed to connect to database after all retries");
@@ -87,9 +82,7 @@ async function runMigrations(): Promise<void> {
     console.log("✅ Migration process completed successfully!");
   } catch (error) {
     console.error("❌ Migration execution failed:", error);
-    console.error(
-      "💡 Please check your database connection and migration files"
-    );
+    console.error("💡 Please check your database connection and migration files");
     throw error;
   } finally {
     await runner.disconnect();

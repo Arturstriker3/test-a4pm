@@ -85,9 +85,7 @@ export async function startServer(app: FastifyInstance): Promise<void> {
   } catch (err) {
     console.error(`❌ Failed to start server on port ${port}`);
     console.error(`❌ Error details:`, err);
-    console.error(
-      "💡 Try changing the PORT in your .env file or kill the process using this port"
-    );
+    console.error("💡 Try changing the PORT in your .env file or kill the process using this port");
     process.exit(1);
   }
 }

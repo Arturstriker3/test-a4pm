@@ -1,7 +1,4 @@
-import {
-  ConflictException,
-  UnauthorizedException,
-} from "../../../common/exceptions";
+import { ConflictException, UnauthorizedException } from "../../../common/exceptions";
 
 /**
  * Domain/Business Rules para o módulo de Users
@@ -16,9 +13,7 @@ export class UserBusinessRules {
    */
   static validateUniqueEmail(existingUser: any): void {
     if (existingUser) {
-      throw new ConflictException(
-        "Já existe um usuário cadastrado com este email"
-      );
+      throw new ConflictException("Já existe um usuário cadastrado com este email");
     }
   }
 
@@ -48,9 +43,17 @@ export class UserBusinessRules {
    */
   static validateUserForRefresh(user: any): void {
     if (!user) {
-      throw new UnauthorizedException(
-        "Usuário não encontrado ou inválido"
-      );
+      throw new UnauthorizedException("Usuário não encontrado ou inválido");
+    }
+  }
+
+  /**
+   * Regra de Negócio: Usuário deve existir para retornar seus dados
+   * Retorna mensagem específica pois token já foi validado previamente
+   */
+  static validateUserForGetUserData(user: any): void {
+    if (!user) {
+      throw new UnauthorizedException("Usuário não encontrado ou inválido");
     }
   }
 }

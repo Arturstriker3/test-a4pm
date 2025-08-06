@@ -1,19 +1,11 @@
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../common/types";
-import {
-  RegisterDto,
-  RegisterResponseDto,
-  LoginDto,
-  LoginResponseDto,
-  TokenResponseDto,
-  RefreshTokenDto,
-} from "./dto";
+import { RegisterDto, RegisterResponseDto, LoginDto, LoginResponseDto, TokenResponseDto, RefreshTokenDto } from "./dto";
 import { RegisterUserUseCase } from "./use-cases/register-user.use-case";
 import { LoginUserUseCase } from "./use-cases/login-user.use-case";
 import { LogoutUserUseCase } from "./use-cases/logout-user.use-case";
 import { UserIdDto } from "../users/dto/id.dto";
 import { RefreshUserUseCase } from "./use-cases/refresh.use-case";
-
 
 @injectable()
 export class AuthService {

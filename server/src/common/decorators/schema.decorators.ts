@@ -35,8 +35,7 @@ export function SchemaProperty(options: SchemaPropertyOptions = {}) {
     // Obtém o tipo da propriedade usando reflect-metadata
     const type = Reflect.getMetadata("design:type", target, propertyKey);
 
-    const existingProperties =
-      Reflect.getMetadata(SCHEMA_PROPERTY_METADATA, target) || {};
+    const existingProperties = Reflect.getMetadata(SCHEMA_PROPERTY_METADATA, target) || {};
 
     // Mapeia tipos TypeScript para tipos JSON Schema
     let schemaType = "string";
@@ -55,11 +54,7 @@ export function SchemaProperty(options: SchemaPropertyOptions = {}) {
       ...options,
     };
 
-    Reflect.defineMetadata(
-      SCHEMA_PROPERTY_METADATA,
-      existingProperties,
-      target
-    );
+    Reflect.defineMetadata(SCHEMA_PROPERTY_METADATA, existingProperties, target);
   };
 }
 
@@ -86,22 +81,17 @@ export function getSchemaFromDto(dtoClass: any): any {
       instance = Object.create(dtoClass.prototype);
     }
 
-    const properties =
-      Reflect.getMetadata(SCHEMA_PROPERTY_METADATA, instance) || {};
-    const classMetadata =
-      Reflect.getMetadata(SCHEMA_CLASS_METADATA, dtoClass) || {};
+    const properties = Reflect.getMetadata(SCHEMA_PROPERTY_METADATA, instance) || {};
+    const classMetadata = Reflect.getMetadata(SCHEMA_CLASS_METADATA, dtoClass) || {};
 
     // Obtém propriedades required do class-validator
     const requiredFields: string[] = [];
     for (const [propertyKey, propertyOptions] of Object.entries(properties)) {
-      const validationMetadata =
-        Reflect.getMetadata("class-validator", instance) || [];
+      const validationMetadata = Reflect.getMetadata("class-validator", instance) || [];
       const hasRequiredValidation = validationMetadata.some(
         (meta: any) =>
           meta.propertyName === propertyKey &&
-          (meta.type === "isNotEmpty" ||
-            meta.type === "isEmail" ||
-            meta.type === "isString")
+          (meta.type === "isNotEmpty" || meta.type === "isEmail" || meta.type === "isString")
       );
 
       if (hasRequiredValidation || (propertyOptions as any).required) {

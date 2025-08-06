@@ -4,3 +4,4 @@ export * from "./route.decorators";
 export * from "./schema.decorators";
 export * from "./api-response-helper.decorator";
 export * from "./param.decorator";
+export * from "./current-user.decorator";

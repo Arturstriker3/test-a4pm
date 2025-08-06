@@ -1,23 +1,13 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { container } from "../common/container";
 import { TYPES } from "../common/types";
-import {
-  getRouteMetadata,
-  getControllerPrefix,
-  HttpMethod,
-} from "../common/decorators/route.decorators";
-import {
-  getRouteAccess,
-  getAccessRoles,
-  RouteAccessType,
-} from "../modules/auth/decorators/access.decorators";
-import {
-  AuthMiddleware,
-  JwtPayload,
-} from "../common/middlewares/auth.middleware";
+import { getRouteMetadata, getControllerPrefix, HttpMethod } from "../common/decorators/route.decorators";
+import { getRouteAccess, getAccessRoles, RouteAccessType } from "../modules/auth/decorators/access.decorators";
+import { AuthMiddleware, JwtPayload } from "../common/middlewares/auth.middleware";
 import { UserRole } from "../modules/users/entities/user.entity";
 import { getMethodMetadata } from "../common/decorators/swagger.decorators";
 import { getParamMetadata } from "../common/decorators/param.decorator";
+import { getCurrentUserMetadata } from "../common/decorators/current-user.decorator";
 import { ValidationException } from "../common/exceptions";
 import { ApiResponse } from "../common/responses";
 import { validate } from "class-validator";
@@ -64,22 +54,12 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
         const allowedRoles = getAccessRoles(controller, route.methodName);
 
         // Cria o handler da rota
-        const routeHandler = createRouteHandler(
-          controller,
-          route.methodName,
-          accessType,
-          allowedRoles
-        );
+        const routeHandler = createRouteHandler(controller, route.methodName, accessType, allowedRoles);
 
         // Cria as opções da rota para o Fastify (incluindo schema para Swagger)
         const routeOptions = {
           handler: routeHandler,
-          schema: createSwaggerSchema(
-            controllerPrefix,
-            route,
-            accessType,
-            allowedRoles
-          ),
+          schema: createSwaggerSchema(controllerPrefix, route, accessType, allowedRoles),
           // Anexa validação mas não falha automaticamente (capturamos manualmente)
           attachValidation: true,
         };
@@ -95,10 +75,7 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
       }
     } catch (error) {
       // Controller não está registrado no container ou não existe
-      console.log(
-        `⚠️  Controller ${controllerName} not available:`,
-        error instanceof Error ? error.message : error
-      );
+      console.log(`⚠️  Controller ${controllerName} not available:`, error instanceof Error ? error.message : error);
     }
   }
 }
@@ -124,9 +101,7 @@ function createRouteHandler(
         // Extrai o token do header Authorization
         const authHeader = request.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-          const response = ApiResponse.unauthorized(
-            "Token de acesso requerido"
-          );
+          const response = ApiResponse.unauthorized("Token de acesso requerido");
           return reply.status(response.code).send(response.toJSON());
         }
 
@@ -153,11 +128,7 @@ function createRouteHandler(
       }
 
       // Prepara os parâmetros para o método do controller usando decorators @Param
-      const params = await extractParametersWithDecorators(
-        request,
-        controller,
-        methodName
-      );
+      const params = await extractParametersWithDecorators(request, controller, methodName);
 
       // Valida body com class-validator se for um método com body
       const method = request.method.toLowerCase();
@@ -179,10 +150,7 @@ function createRouteHandler(
         const jsonResponse = result.toJSON();
         // Para Fins de Debugging
         // console.log("Sending response:", JSON.stringify(jsonResponse, null, 2));
-        return reply
-          .status(result.code)
-          .type("application/json")
-          .send(JSON.stringify(jsonResponse));
+        return reply.status(result.code).type("application/json").send(JSON.stringify(jsonResponse));
       }
 
       // Caso contrário, envolve em uma resposta de sucesso
@@ -208,10 +176,7 @@ function createRouteHandler(
 /**
  * Extrai parâmetros para o método do controller baseado na request
  */
-function extractMethodParameters(
-  request: FastifyRequest,
-  methodName: string
-): any[] {
+function extractMethodParameters(request: FastifyRequest, methodName: string): any[] {
   const method = request.method.toLowerCase();
   const hasParams = request.params && Object.keys(request.params).length > 0;
   const hasQuery = request.query && Object.keys(request.query).length > 0;
@@ -257,17 +222,26 @@ async function extractParametersWithDecorators(
   methodName: string
 ): Promise<any[]> {
   const paramMetadata = getParamMetadata(controller, methodName);
+  const currentUserMetadata = getCurrentUserMetadata(controller, methodName);
 
-  if (paramMetadata.length === 0) {
-    // Fallback para o método antigo se não tiver decorators @Param
+  const totalParams = paramMetadata.length + currentUserMetadata.length;
+
+  if (totalParams === 0) {
+    // Verifica se o método espera parâmetros mesmo sem decorators
+    const method = controller[methodName];
+    if (method && method.length > 0) {
+      // Se o método espera parâmetros mas não tem decorators,
+      // passa o request inteiro como primeiro parâmetro
+      return [request];
+    }
+    // Fallback para o método antigo se não tiver decorators e não esperar parâmetros
     return extractMethodParameters(request, methodName);
   }
 
-  // Ordenar por índice do parâmetro
-  paramMetadata.sort((a, b) => a.index - b.index);
-
+  // Inicializa array de parâmetros
   const parameters: any[] = [];
 
+  // Processa parâmetros @Param
   for (const param of paramMetadata) {
     const paramValue = (request.params as any)?.[param.paramName];
 
@@ -281,8 +255,7 @@ async function extractParametersWithDecorators(
       if (errors.length > 0) {
         const firstError = errors[0];
         const message =
-          Object.values(firstError.constraints || {})[0] ||
-          `Erro de validação no parâmetro ${param.paramName}`;
+          Object.values(firstError.constraints || {})[0] || `Erro de validação no parâmetro ${param.paramName}`;
         throw new ValidationException(message);
       }
 
@@ -292,6 +265,13 @@ async function extractParametersWithDecorators(
       // Sem validação, apenas passa o valor
       parameters[param.index] = paramValue;
     }
+  }
+
+  // Processa parâmetros @CurrentUser
+  for (const userParam of currentUserMetadata) {
+    // Extrai o usuário autenticado do request
+    const user = (request as any).user;
+    parameters[userParam.index] = user;
   }
 
   return parameters;
@@ -308,13 +288,10 @@ function createSwaggerSchema(
 ) {
   // Remove a barra inicial do prefixo para criar o nome da tag
   const tagName =
-    controllerPrefix.replace(/^\//, "").charAt(0).toUpperCase() +
-    controllerPrefix.replace(/^\//, "").slice(1);
+    controllerPrefix.replace(/^\//, "").charAt(0).toUpperCase() + controllerPrefix.replace(/^\//, "").slice(1);
 
   // Obtém metadados dos decorators Swagger
-  const controller = container.get(
-    TYPES[`${tagName}Controller` as keyof typeof TYPES]
-  ) as any;
+  const controller = container.get(TYPES[`${tagName}Controller` as keyof typeof TYPES]) as any;
   const swaggerMetadata = getMethodMetadata(controller, route.methodName);
 
   // Cria o nome/summary baseado no acesso ou usa o do decorator
@@ -373,11 +350,7 @@ function createSwaggerSchema(
 /**
  * Valida o body da request usando class-validator
  */
-async function validateRequestBody(
-  body: any,
-  methodName: string,
-  controller: any
-): Promise<void> {
+async function validateRequestBody(body: any, methodName: string, controller: any): Promise<void> {
   // Mapeamento dos DTOs por método
   const dtoMap: { [key: string]: any } = {
     register: require("../modules/auth/dto").RegisterDto,
@@ -398,8 +371,7 @@ async function validateRequestBody(
   if (errors.length > 0) {
     // Pega a primeira mensagem de erro
     const firstError = errors[0];
-    const message =
-      Object.values(firstError.constraints || {})[0] || "Erro de validação";
+    const message = Object.values(firstError.constraints || {})[0] || "Erro de validação";
     throw new ValidationException(message);
   }
 }
@@ -408,11 +380,7 @@ async function validateRequestBody(
  * Valida parâmetros da URL usando class-validator (FUTURO)
  * Atualmente o projeto usa validação manual nos controllers
  */
-async function validateRequestParams(
-  params: any,
-  methodName: string,
-  controller: any
-): Promise<void> {
+async function validateRequestParams(params: any, methodName: string, controller: any): Promise<void> {
   // Mapeamento dos DTOs para parâmetros por método
   const paramDtoMap: { [key: string]: any } = {
     // logout: require("../modules/users/dto").UserIdDto,
@@ -433,9 +401,7 @@ async function validateRequestParams(
   if (errors.length > 0) {
     // Pega a primeira mensagem de erro
     const firstError = errors[0];
-    const message =
-      Object.values(firstError.constraints || {})[0] ||
-      "Erro de validação de parâmetros";
+    const message = Object.values(firstError.constraints || {})[0] || "Erro de validação de parâmetros";
     throw new ValidationException(message);
   }
 }

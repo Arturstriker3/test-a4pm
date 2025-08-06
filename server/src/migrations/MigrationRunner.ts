@@ -42,9 +42,7 @@ export class MigrationRunner {
       throw new Error("Database connection not established");
     }
 
-    const [rows] = await this.connection.execute(
-      "SELECT name FROM migrations ORDER BY timestamp ASC"
-    );
+    const [rows] = await this.connection.execute("SELECT name FROM migrations ORDER BY timestamp ASC");
 
     return (rows as any[]).map((row) => row.name);
   }
@@ -54,10 +52,10 @@ export class MigrationRunner {
       throw new Error("Database connection not established");
     }
 
-    await this.connection.execute(
-      "INSERT INTO migrations (name, timestamp) VALUES (?, ?)",
-      [migration.name, migration.timestamp]
-    );
+    await this.connection.execute("INSERT INTO migrations (name, timestamp) VALUES (?, ?)", [
+      migration.name,
+      migration.timestamp,
+    ]);
   }
 
   private async removeMigrationRecord(migrationName: string): Promise<void> {
@@ -65,19 +63,14 @@ export class MigrationRunner {
       throw new Error("Database connection not established");
     }
 
-    await this.connection.execute("DELETE FROM migrations WHERE name = ?", [
-      migrationName,
-    ]);
+    await this.connection.execute("DELETE FROM migrations WHERE name = ?", [migrationName]);
   }
 
   private async loadMigrations(): Promise<Migration[]> {
     const migrationsDir = path.join(__dirname, "files");
     const migrationFiles = fs
       .readdirSync(migrationsDir)
-      .filter(
-        (file) =>
-          file.endsWith(".migration.ts") || file.endsWith(".migration.js")
-      )
+      .filter((file) => file.endsWith(".migration.ts") || file.endsWith(".migration.js"))
       .sort();
 
     const migrations: Migration[] = [];
@@ -88,16 +81,10 @@ export class MigrationRunner {
         const migrationModule = require(filePath);
         const migration = migrationModule.default || migrationModule;
 
-        if (
-          migration &&
-          typeof migration.up === "function" &&
-          typeof migration.down === "function"
-        ) {
+        if (migration && typeof migration.up === "function" && typeof migration.down === "function") {
           migrations.push(migration);
         } else {
-          console.warn(
-            `⚠️  Migration file ${file} does not export a valid migration object`
-          );
+          console.warn(`⚠️  Migration file ${file} does not export a valid migration object`);
         }
       } catch (error) {
         console.error(`❌ Error loading migration ${file}:`, error);
@@ -115,9 +102,7 @@ export class MigrationRunner {
     const executedMigrations = await this.getExecutedMigrations();
     const allMigrations = await this.loadMigrations();
 
-    const pendingMigrations = allMigrations.filter(
-      (migration) => !executedMigrations.includes(migration.name)
-    );
+    const pendingMigrations = allMigrations.filter((migration) => !executedMigrations.includes(migration.name));
 
     if (pendingMigrations.length === 0) {
       console.log("✅ No pending migrations found");
@@ -168,9 +153,7 @@ export class MigrationRunner {
 
     const lastMigrationName = executedMigrations[executedMigrations.length - 1];
     const allMigrations = await this.loadMigrations();
-    const migrationToRollback = allMigrations.find(
-      (m) => m.name === lastMigrationName
-    );
+    const migrationToRollback = allMigrations.find((m) => m.name === lastMigrationName);
 
     if (!migrationToRollback) {
       throw new Error(`Migration file not found for: ${lastMigrationName}`);
@@ -215,9 +198,7 @@ export class MigrationRunner {
     }
 
     for (const migration of allMigrations) {
-      const status = executedMigrations.includes(migration.name)
-        ? "✅ Executed"
-        : "⏳ Pending";
+      const status = executedMigrations.includes(migration.name) ? "✅ Executed" : "⏳ Pending";
       const date = new Date(migration.timestamp).toISOString();
       console.log(`${status} | ${migration.name} | ${date}`);
     }

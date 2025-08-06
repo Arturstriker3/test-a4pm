@@ -1,12 +1,4 @@
-import {
-  IsString,
-  IsEmail,
-  IsOptional,
-  IsDate,
-  MinLength,
-  IsUUID,
-  IsEnum,
-} from "class-validator";
+import { IsString, IsEmail, IsOptional, IsDate, MinLength, IsUUID, IsEnum } from "class-validator";
 import { Type } from "class-transformer";
 
 export enum UserRole {
