@@ -159,6 +159,40 @@ export class CustomSwaggerService {
   }
 
   /**
+   * Gera tags elegantes de acesso para o summary
+   */
+  private generateAccessTags(accessType: any, accessRoles: any[]): string {
+    const tags: string[] = [];
+
+    if (accessType === "PUBLIC") {
+      // Rota pública - só mostra que é pública
+      tags.push("[🟢 Public]");
+    } else if (accessType === "AUTHENTICATED") {
+      // Rota privada - mostra que é privada
+      tags.push("[🔴 Private]");
+
+      // Se tem roles específicos, mostra quais roles podem acessar
+      if (accessRoles && accessRoles.length > 0) {
+        const rolesTags = accessRoles
+          .map((role) => {
+            switch (role) {
+              case "ADMIN":
+                return "👨‍💼 ADMIN";
+              case "DEFAULT":
+                return "👨🏻‍💻 USER";
+              default:
+                return `🛡️ ${role}`;
+            }
+          })
+          .join(" ");
+        tags.push(`[${rolesTags}]`);
+      }
+    }
+
+    return tags.join(" ");
+  }
+
+  /**
    * Coleta metadata dos controllers registrados
    */
   private collectRouteMetadata(): void {
@@ -166,7 +200,7 @@ export class CustomSwaggerService {
     const { container } = require("../common/container");
     const { TYPES } = require("../common/types");
     const { getRouteMetadata, getControllerPrefix } = require("../common/decorators/route.decorators");
-    const { getRouteAccess, RouteAccessType } = require("../modules/auth/decorators/access.decorators");
+    const { getRouteAccess, getAccessRoles, RouteAccessType } = require("../modules/auth/decorators/access.decorators");
 
     // Mapeamento dos controllers disponíveis
     const CONTROLLERS = {
@@ -202,9 +236,15 @@ export class CustomSwaggerService {
 
           // Obtém informações de acesso da rota
           const accessType = getRouteAccess(controller, route.methodName);
+          const accessRoles = getAccessRoles(controller, route.methodName);
 
           // Obtém metadata do Swagger para o método
           const metadata = getMethodMetadata(controller, route.methodName);
+
+          // Gera summary com tags de acesso elegantes
+          const baseSummary = metadata.operation?.summary || `${route.method.toUpperCase()} ${swaggerPath}`;
+          const accessTags = this.generateAccessTags(accessType, accessRoles);
+          const enhancedSummary = accessTags ? `${baseSummary} ${accessTags}` : baseSummary;
 
           // Cria entrada no paths do Swagger
           if (!this.swaggerDefinition.paths[swaggerPath]) {
@@ -213,7 +253,7 @@ export class CustomSwaggerService {
 
           const pathItem: any = {
             tags: metadata.tags.length > 0 ? metadata.tags : [controllerName.replace("Controller", "")],
-            summary: metadata.operation?.summary || `${route.method.toUpperCase()} ${swaggerPath}`,
+            summary: enhancedSummary,
             description: metadata.operation?.description || "",
             responses: this.processResponses(metadata.responses),
           };
