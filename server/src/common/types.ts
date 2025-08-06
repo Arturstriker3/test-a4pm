@@ -29,4 +29,5 @@ export const TYPES = {
   RecipesRepository: Symbol.for("RecipesRepository"),
   CreateRecipeUseCase: Symbol.for("CreateRecipeUseCase"),
   UpdateRecipeUseCase: Symbol.for("UpdateRecipeUseCase"),
+  GetRecipesPaginatedUseCase: Symbol.for("GetRecipesPaginatedUseCase"),
 } as const;

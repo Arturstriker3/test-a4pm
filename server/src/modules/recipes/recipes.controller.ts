@@ -1,9 +1,10 @@
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../common/types";
 import { RecipesService } from "./recipes.service";
-import { CreateRecipeDto, CreateRecipeResponseDto, UpdateRecipeDto, UpdateRecipeResponseDto } from "./dto";
-import { Controller, Post, Patch, Body, Param } from "../../common/decorators";
-import { ApiResponse } from "../../common/responses";
+import { CreateRecipeDto, CreateRecipeResponseDto, UpdateRecipeDto, UpdateRecipeResponseDto, RecipeDto } from "./dto";
+import { Controller, Post, Patch, Get, Body, Param, Query } from "../../common/decorators";
+import { ApiResponse, PaginatedData } from "../../common/responses";
+import { PaginationParamsDto } from "../../common/dto";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { CurrentUserFull } from "../../common/decorators/current-user-full.decorator";
 import { RouteAccess, RouteAccessType } from "../auth/decorators/access.decorators";
@@ -17,6 +18,7 @@ import {
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiQuery,
 } from "../../common/decorators";
 import { JwtPayload } from "../../common/middlewares/auth.middleware";
 
@@ -25,6 +27,59 @@ import { JwtPayload } from "../../common/middlewares/auth.middleware";
 @HandleClassExceptions
 export class RecipesController {
   constructor(@inject(TYPES.RecipesService) private readonly recipesService: RecipesService) {}
+
+  @Get("/")
+  @RouteAccess(RouteAccessType.AUTHENTICATED)
+  @ApiOperation({
+    summary: "Listar receitas com paginação",
+    description:
+      "Retorna uma lista paginada de receitas. Usuários normais veem apenas suas receitas, administradores veem todas.",
+  })
+  @ApiQuery({
+    name: "page",
+    type: "number",
+    description: "Número da página (baseado em 1)",
+    required: false,
+    example: 1,
+    minimum: 1,
+    default: 1,
+  })
+  @ApiQuery({
+    name: "limit",
+    type: "number",
+    description: "Número de itens por página",
+    required: false,
+    example: 10,
+    minimum: 1,
+    maximum: 100,
+    default: 10,
+  })
+  @ApiSuccessResponse({
+    description: "Lista de receitas retornada com sucesso",
+    dataType: RecipeDto,
+  })
+  @ApiUnauthorizedResponse({
+    messageExample: "Token inválido ou expirado",
+  })
+  async findAll(
+    @Query(PaginationParamsDto) pagination: PaginationParamsDto,
+    @CurrentUserFull() user: JwtPayload
+  ): Promise<ApiResponse<PaginatedData<RecipeDto>>> {
+    const { items, total } = await this.recipesService.findAllPaginated(
+      pagination.page!,
+      pagination.limit!,
+      pagination.offset,
+      user.userId,
+      user.role as any
+    );
+    return ApiResponse.paginated(
+      items,
+      pagination.page!,
+      pagination.limit!,
+      total,
+      "Lista de receitas retornada com sucesso"
+    );
+  }
 
   @Post()
   @RouteAccess(RouteAccessType.AUTHENTICATED)

@@ -146,4 +146,87 @@ export class RecipesRepository {
 
     return updatedRecipe;
   }
+
+  async findAllPaginated(page: number, limit: number, offset: number): Promise<{ items: any[]; total: number }> {
+    const connection = await this.databaseService.getConnection();
+
+    const countQuery = `
+      SELECT COUNT(*) as total 
+      FROM teste_receitas_rg_sistemas.receitas r
+    `;
+
+    const dataQuery = `
+      SELECT 
+        r.id,
+        r.nome,
+        r.ingredientes,
+        r.modo_preparo,
+        r.tempo_preparo_minutos as tempo_preparo,
+        r.porcoes,
+        r.id_categorias,
+        r.id_usuarios,
+        r.criado_em,
+        r.alterado_em,
+        c.nome as categoria_nome,
+        u.nome as usuario_nome
+      FROM teste_receitas_rg_sistemas.receitas r
+      LEFT JOIN teste_receitas_rg_sistemas.categorias c ON r.id_categorias = c.id
+      LEFT JOIN teste_receitas_rg_sistemas.usuarios u ON r.id_usuarios = u.id
+      ORDER BY r.criado_em DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const [countResult] = await connection.execute(countQuery);
+    const [dataResult] = await connection.execute(dataQuery, [limit, offset]);
+
+    const total = (countResult as any[])[0].total;
+    const items = dataResult as any[];
+
+    return { items, total };
+  }
+
+  async findByUserIdPaginated(
+    userId: string,
+    page: number,
+    limit: number,
+    offset: number
+  ): Promise<{ items: any[]; total: number }> {
+    const connection = await this.databaseService.getConnection();
+
+    const countQuery = `
+      SELECT COUNT(*) as total 
+      FROM teste_receitas_rg_sistemas.receitas r
+      WHERE r.id_usuarios = ?
+    `;
+
+    const dataQuery = `
+      SELECT 
+        r.id,
+        r.nome,
+        r.ingredientes,
+        r.modo_preparo,
+        r.tempo_preparo_minutos as tempo_preparo,
+        r.porcoes,
+        r.id_categorias,
+        r.id_usuarios,
+        r.criado_em,
+        r.alterado_em,
+        c.nome as categoria_nome,
+        u.nome as usuario_nome
+      FROM teste_receitas_rg_sistemas.receitas r
+      LEFT JOIN teste_receitas_rg_sistemas.categorias c ON r.id_categorias = c.id
+      LEFT JOIN teste_receitas_rg_sistemas.usuarios u ON r.id_usuarios = u.id
+      WHERE r.id_usuarios = ?
+      ORDER BY r.criado_em DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const [countResult] = await connection.execute(countQuery, [userId]);
+    const [dataResult] = await connection.execute(dataQuery, [userId, limit, offset]);
+
+    const total = (countResult as any[])[0].total;
+    const items = dataResult as any[];
+
+    return { items, total };
+  }
 }
