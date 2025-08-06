@@ -8,6 +8,7 @@ import { UserRole } from "../modules/users/entities/user.entity";
 import { getMethodMetadata } from "../common/decorators/swagger.decorators";
 import { getParamMetadata, getQueryMetadata } from "../common/decorators/param.decorator";
 import { getCurrentUserMetadata } from "../common/decorators/current-user.decorator";
+import { getCurrentUserFullMetadata } from "../common/decorators/current-user-full.decorator";
 import { BODY_METADATA_KEY, BodyMetadata } from "../common/decorators/body.decorator";
 import { ValidationException } from "../common/exceptions";
 import { ApiResponse } from "../common/responses";
@@ -226,10 +227,15 @@ async function extractParametersWithDecorators(
   const paramMetadata = getParamMetadata(controller, methodName);
   const queryMetadata = getQueryMetadata(controller, methodName);
   const currentUserMetadata = getCurrentUserMetadata(controller, methodName);
+  const currentUserFullMetadata = getCurrentUserFullMetadata(controller, methodName);
   const bodyMetadata: BodyMetadata[] = Reflect.getMetadata(BODY_METADATA_KEY, controller, methodName) || [];
 
   const totalDecorators =
-    paramMetadata.length + (queryMetadata ? 1 : 0) + currentUserMetadata.length + bodyMetadata.length;
+    paramMetadata.length +
+    (queryMetadata ? 1 : 0) +
+    currentUserMetadata.length +
+    currentUserFullMetadata.length +
+    bodyMetadata.length;
   const methodParamCount = controller[methodName].length;
 
   if (totalDecorators === 0) {
@@ -319,6 +325,14 @@ async function extractParametersWithDecorators(
     const user = (request as any).user;
     // O @CurrentUser decorator deve retornar apenas o userId (string)
     parameters[userParam.index] = user?.userId;
+  }
+
+  // Processa parâmetros @CurrentUserFull
+  for (const userFullParam of currentUserFullMetadata) {
+    // Extrai o usuário autenticado completo do request
+    const user = (request as any).user;
+    // O @CurrentUserFull decorator deve retornar o usuário completo
+    parameters[userFullParam.index] = user;
   }
 
   return parameters;

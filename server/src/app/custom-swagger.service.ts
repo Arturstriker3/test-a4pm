@@ -348,7 +348,7 @@ export class CustomSwaggerService {
       try {
         // Força gerar schema com examples diretamente do DTO
         schema = getSchemaWithExamplesFromDto(body.type);
-        console.log(`🔧 Generating schema with examples for ${body.type.name}:`, JSON.stringify(schema, null, 2));
+        // console.log(`🔧 Generating schema with examples for ${body.type.name}:`, JSON.stringify(schema, null, 2));
 
         // Adiciona o schema aos componentes usando o nome do DTO
         this.addSchemaToComponents(body.type.name, schema);

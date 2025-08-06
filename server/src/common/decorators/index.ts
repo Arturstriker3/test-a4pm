@@ -5,4 +5,5 @@ export * from "./schema.decorators";
 export * from "./api-response-helper.decorator";
 export * from "./param.decorator";
 export * from "./current-user.decorator";
+export * from "./current-user-full.decorator";
 export * from "./body.decorator";
