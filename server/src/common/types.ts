@@ -21,6 +21,7 @@ export const TYPES = {
   CategoriesService: Symbol.for("CategoriesService"),
   CategoriesController: Symbol.for("CategoriesController"),
   CategoriesRepository: Symbol.for("CategoriesRepository"),
+  GetCategoriesPaginatedUseCase: Symbol.for("GetCategoriesPaginatedUseCase"),
 
   // Recipes Module
   RecipesService: Symbol.for("RecipesService"),

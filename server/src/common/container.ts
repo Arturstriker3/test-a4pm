@@ -23,6 +23,7 @@ import { GetUserByIdUseCase } from "../modules/users/use-cases/get-user-by-id.us
 import { CategoriesService } from "../modules/categories/categories.service";
 import { CategoriesController } from "../modules/categories/categories.controller";
 import { CategoriesRepository } from "../modules/categories/categories.repository";
+import { GetCategoriesPaginatedUseCase } from "../modules/categories/use-cases/get-categories-paginated.use-case";
 
 // Recipes Module
 import { RecipesService } from "../modules/recipes/recipes.service";
@@ -50,9 +51,10 @@ container.bind<UsersService>(TYPES.UsersService).to(UsersService);
 container.bind<UsersController>(TYPES.UsersController).to(UsersController);
 
 // Bind Categories Module
+container.bind<CategoriesRepository>(TYPES.CategoriesRepository).to(CategoriesRepository);
+container.bind<GetCategoriesPaginatedUseCase>(TYPES.GetCategoriesPaginatedUseCase).to(GetCategoriesPaginatedUseCase);
 container.bind<CategoriesService>(TYPES.CategoriesService).to(CategoriesService);
 container.bind<CategoriesController>(TYPES.CategoriesController).to(CategoriesController);
-container.bind<CategoriesRepository>(TYPES.CategoriesRepository).to(CategoriesRepository);
 
 // Bind Recipes Module
 container.bind<RecipesService>(TYPES.RecipesService).to(RecipesService);
