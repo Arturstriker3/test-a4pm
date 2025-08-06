@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { TYPES } from "../../common/types";
 import { RecipesService } from "./recipes.service";
 import { CreateRecipeDto, CreateRecipeResponseDto, UpdateRecipeDto, UpdateRecipeResponseDto, RecipeDto } from "./dto";
-import { Controller, Post, Patch, Get, Body, Param, Query } from "../../common/decorators";
+import { Controller, Post, Patch, Get, Delete, Body, Param, Query } from "../../common/decorators";
 import { ApiResponse, PaginatedData } from "../../common/responses";
 import { PaginationParamsDto } from "../../common/dto";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
@@ -143,5 +143,28 @@ export class RecipesController {
   ): Promise<ApiResponse<UpdateRecipeResponseDto>> {
     const response = await this.recipesService.updateRecipe(recipeId, updateRecipeDto, user.userId, user.role as any);
     return ApiResponse.success(response, "Receita atualizada com sucesso");
+  }
+
+  @Delete("/:id")
+  @RouteAccess(RouteAccessType.AUTHENTICATED)
+  @ApiOperation({
+    summary: "Deletar receita",
+    description: "Deleta uma receita existente. Apenas o proprietário da receita ou administradores podem deletar.",
+  })
+  @ApiSuccessResponse({
+    description: "Receita deletada com sucesso",
+  })
+  @ApiUnauthorizedResponse({
+    messageExample: "Token de acesso inválido",
+  })
+  @ApiForbiddenResponse({
+    messageExample: "Você só pode deletar suas próprias receitas",
+  })
+  @ApiNotFoundResponse({
+    messageExample: "Receita não encontrada",
+  })
+  async deleteRecipe(@Param("id") recipeId: string, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<null>> {
+    await this.recipesService.deleteRecipe(recipeId, user.userId, user.role as any);
+    return ApiResponse.success(null, "Receita deletada com sucesso");
   }
 }

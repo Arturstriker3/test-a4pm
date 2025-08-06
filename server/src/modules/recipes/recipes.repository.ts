@@ -229,4 +229,15 @@ export class RecipesRepository {
 
     return { items, total };
   }
+
+  async delete(id: string): Promise<void> {
+    const connection = await this.databaseService.getConnection();
+
+    const query = `
+      DELETE FROM teste_receitas_rg_sistemas.receitas 
+      WHERE id = ?
+    `;
+
+    await connection.execute(query, [id]);
+  }
 }
