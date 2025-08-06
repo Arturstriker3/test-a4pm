@@ -1,53 +1,51 @@
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../common/types";
 import { RecipesService } from "./recipes.service";
-import { Controller, Get, Post, Put, Delete } from "../../common/decorators";
-import { RouteAccess, AccessTo, RouteAccessType } from "../auth/decorators/access.decorators";
-import { UserRole } from "../users/entities/user.entity";
+import { CreateRecipeDto, CreateRecipeResponseDto } from "./dto";
+import { Controller, Post, Body } from "../../common/decorators";
 import { ApiResponse } from "../../common/responses";
-import { CreateRecipeDto, UpdateRecipeDto } from "./dto/recipe.dto";
+import { CurrentUser } from "../../common/decorators/current-user.decorator";
+import { RouteAccess, RouteAccessType } from "../auth/decorators/access.decorators";
+import {
+  HandleClassExceptions,
+  ApiOperation,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiUnauthorizedResponse,
+} from "../../common/decorators";
 
 @injectable()
 @Controller("/recipes")
+@HandleClassExceptions
 export class RecipesController {
-  constructor(
-    @inject(TYPES.RecipesService)
-    private readonly recipesService: RecipesService
-  ) {}
+  constructor(@inject(TYPES.RecipesService) private readonly recipesService: RecipesService) {}
 
-  @Get("/")
-  @RouteAccess(RouteAccessType.PUBLIC)
-  async findAll(): Promise<ApiResponse<any[]>> {
-    // TODO: Implementar busca de todas as receitas
-    return ApiResponse.success([], "Receitas listadas com sucesso");
-  }
-
-  @Get("/:id")
-  @RouteAccess(RouteAccessType.PUBLIC)
-  async findById(params: { id: string }): Promise<ApiResponse<any>> {
-    // TODO: Implementar busca por ID
-    return ApiResponse.success({ id: params.id, nome: "Receita" }, "Receita encontrada");
-  }
-
-  @Post("/")
+  @Post()
   @RouteAccess(RouteAccessType.AUTHENTICATED)
-  async create(recipeDto: CreateRecipeDto): Promise<ApiResponse<any>> {
-    // TODO: Implementar criação de receita
-    return ApiResponse.created(recipeDto, "Receita criada com sucesso");
-  }
-
-  @Put("/:id")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  async update(params: { id: string }, recipeDto: UpdateRecipeDto): Promise<ApiResponse<any>> {
-    // TODO: Implementar atualização de receita
-    return ApiResponse.success({ ...recipeDto, id: params.id }, "Receita atualizada com sucesso");
-  }
-
-  @Delete("/:id")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  @AccessTo(UserRole.ADMIN)
-  async delete(params: { id: string }): Promise<ApiResponse<void>> {
-    // TODO: Implementar exclusão de receita
-    return ApiResponse.success(undefined, "Receita excluída com sucesso");
+  @ApiOperation({
+    summary: "Criar nova receita",
+    description: "Cria uma nova receita no sistema para o usuário autenticado.",
+  })
+  @ApiBody({
+    type: CreateRecipeDto,
+    description: "Dados para criação da receita",
+  })
+  @ApiCreatedResponse({
+    description: "Receita criada com sucesso",
+    dataType: CreateRecipeResponseDto,
+  })
+  @ApiBadRequestResponse({
+    messageExample: "Nome da receita é obrigatório",
+  })
+  @ApiUnauthorizedResponse({
+    messageExample: "Token de acesso inválido",
+  })
+  async createRecipe(
+    @Body(CreateRecipeDto) createRecipeDto: CreateRecipeDto,
+    @CurrentUser() userId: string
+  ): Promise<ApiResponse<CreateRecipeResponseDto>> {
+    const response = await this.recipesService.createRecipe(createRecipeDto, userId);
+    return ApiResponse.created(response, "Receita criada com sucesso");
   }
 }

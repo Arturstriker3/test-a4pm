@@ -5,7 +5,7 @@ import { networkInterfaces } from "os";
 import { container } from "../common/container";
 import { TYPES } from "../common/types";
 import { getMethodMetadata, SWAGGER_METADATA } from "../common/decorators/swagger.decorators";
-import { getSchemaFromDto } from "../common/decorators/schema.decorators";
+import { getSchemaWithExamplesFromDto } from "../common/decorators/schema.decorators";
 
 /**
  * Função para obter informações de rede (local e IPs externos)
@@ -316,7 +316,7 @@ export class CustomSwaggerService {
 
       if (response.type && !schema) {
         try {
-          schema = getSchemaFromDto(response.type);
+          schema = getSchemaWithExamplesFromDto(response.type);
           this.addSchemaToComponents(response.type.name, schema);
           schema = { $ref: `#/components/schemas/${response.type.name}` };
         } catch (error) {
@@ -343,12 +343,28 @@ export class CustomSwaggerService {
   private processRequestBody(body: any): any {
     let schema = body.schema;
 
-    if (body.type && !schema) {
+    // SOLUÇÃO DRÁSTICA: Força usar o DTO original com examples
+    if (body.type) {
       try {
-        schema = getSchemaFromDto(body.type);
+        // Força gerar schema com examples diretamente do DTO
+        schema = getSchemaWithExamplesFromDto(body.type);
+        console.log(`🔧 Generating schema with examples for ${body.type.name}:`, JSON.stringify(schema, null, 2));
+
+        // Adiciona o schema aos componentes usando o nome do DTO
         this.addSchemaToComponents(body.type.name, schema);
-        schema = { $ref: `#/components/schemas/${body.type.name}` };
+
+        // Retorna a referência inline (não por referência) para garantir que os examples apareçam
+        return {
+          description: body.description || "Dados da requisição",
+          required: body.required !== false,
+          content: {
+            "application/json": {
+              schema: schema, // Schema inline com examples
+            },
+          },
+        };
       } catch (error) {
+        console.error(`❌ Error generating schema for ${body.type?.name}:`, error);
         schema = { type: "object" };
       }
     }

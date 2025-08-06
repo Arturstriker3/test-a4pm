@@ -29,6 +29,7 @@ import { GetCategoriesPaginatedUseCase } from "../modules/categories/use-cases/g
 import { RecipesService } from "../modules/recipes/recipes.service";
 import { RecipesController } from "../modules/recipes/recipes.controller";
 import { RecipesRepository } from "../modules/recipes/recipes.repository";
+import { CreateRecipeUseCase } from "../modules/recipes/use-cases/create-recipe.use-case";
 
 const container = new Container();
 
@@ -57,8 +58,9 @@ container.bind<CategoriesService>(TYPES.CategoriesService).to(CategoriesService)
 container.bind<CategoriesController>(TYPES.CategoriesController).to(CategoriesController);
 
 // Bind Recipes Module
+container.bind<RecipesRepository>(TYPES.RecipesRepository).to(RecipesRepository);
+container.bind<CreateRecipeUseCase>(TYPES.CreateRecipeUseCase).to(CreateRecipeUseCase);
 container.bind<RecipesService>(TYPES.RecipesService).to(RecipesService);
 container.bind<RecipesController>(TYPES.RecipesController).to(RecipesController);
-container.bind<RecipesRepository>(TYPES.RecipesRepository).to(RecipesRepository);
 
 export { container };

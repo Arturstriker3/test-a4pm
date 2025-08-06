@@ -29,6 +29,26 @@ export class CategoriesRepository {
     }));
   }
 
+  async findById(id: string): Promise<Category | null> {
+    const connection = await this.databaseService.getConnection();
+
+    const query = `
+      SELECT id, nome
+      FROM teste_receitas_rg_sistemas.categorias 
+      WHERE id = ?
+    `;
+
+    const [rows] = await connection.execute(query, [id]);
+    const results = rows as any[];
+
+    return results.length > 0
+      ? {
+          id: results[0].id,
+          nome: results[0].nome,
+        }
+      : null;
+  }
+
   async count(): Promise<number> {
     const connection = await this.databaseService.getConnection();
 

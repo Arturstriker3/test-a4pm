@@ -85,13 +85,24 @@ function generateDataSchema(dataType: any, examples?: PropertyExample) {
 
         if (metadata) {
           // Usa os metadados do @SchemaProperty
-          properties[key] = {
-            type: metadata.type || "string",
+          const propertySchema: any = {
+            type: metadata.type,
             description: metadata.description,
             example: examples?.[key] || metadata.example,
             format: metadata.format,
             enum: metadata.enum,
+            minimum: metadata.minimum,
+            maximum: metadata.maximum,
+            minLength: metadata.minLength,
+            maxLength: metadata.maxLength,
           };
+
+          // Se tem minimum ou maximum, garante que o tipo seja number
+          if (metadata.minimum !== undefined || metadata.maximum !== undefined) {
+            propertySchema.type = "number";
+          }
+
+          properties[key] = propertySchema;
 
           // Remove propriedades undefined
           Object.keys(properties[key]).forEach((prop) => {
