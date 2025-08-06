@@ -140,6 +140,25 @@ export class CustomSwaggerService {
   }
 
   /**
+   * Processa query parameters dos decorators @ApiQuery
+   */
+  private processQueryParameters(queries: any[]): any[] {
+    return queries.map((query) => ({
+      name: query.name,
+      in: "query",
+      required: query.required || false,
+      schema: {
+        type: query.type || "string",
+        minimum: query.minimum,
+        maximum: query.maximum,
+        default: query.default,
+      },
+      description: query.description || `Query parameter ${query.name}`,
+      example: query.example,
+    }));
+  }
+
+  /**
    * Coleta metadata dos controllers registrados
    */
   private collectRouteMetadata(): void {
@@ -204,9 +223,22 @@ export class CustomSwaggerService {
             pathItem.requestBody = this.processRequestBody(metadata.body);
           }
 
+          // Inicializar array de parâmetros
+          const parameters: any[] = [];
+
           // Adicionar parâmetros de path
           if (route.path.includes(":")) {
-            pathItem.parameters = this.extractPathParameters(route.path);
+            parameters.push(...this.extractPathParameters(route.path));
+          }
+
+          // Adicionar query parameters
+          if (metadata.queries && metadata.queries.length > 0) {
+            parameters.push(...this.processQueryParameters(metadata.queries));
+          }
+
+          // Adicionar parâmetros se houver
+          if (parameters.length > 0) {
+            pathItem.parameters = parameters;
           }
 
           // Adicionar segurança se não for rota pública

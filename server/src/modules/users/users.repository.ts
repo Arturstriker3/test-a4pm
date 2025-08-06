@@ -103,4 +103,43 @@ export class UsersRepository {
 
     await connection.execute(query, [recoveryToken, userId]);
   }
+
+  async findWithPagination(offset: number, limit: number): Promise<User[]> {
+    const connection = await this.databaseService.getConnection();
+
+    const query = `
+      SELECT id, nome, login, senha, nivel_acesso, recovery_token, criado_em, alterado_em
+      FROM teste_receitas_rg_sistemas.usuarios 
+      ORDER BY criado_em DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const [rows] = await connection.execute(query, [limit, offset]);
+    const users = rows as any[];
+
+    return users.map((row) => ({
+      id: row.id,
+      nome: row.nome,
+      login: row.login,
+      senha: row.senha,
+      nivel_acesso: row.nivel_acesso,
+      recovery_token: row.recovery_token,
+      criado_em: row.criado_em,
+      alterado_em: row.alterado_em,
+    }));
+  }
+
+  async count(): Promise<number> {
+    const connection = await this.databaseService.getConnection();
+
+    const query = `
+      SELECT COUNT(*) as total
+      FROM teste_receitas_rg_sistemas.usuarios
+    `;
+
+    const [rows] = await connection.execute(query);
+    const result = rows as any[];
+
+    return result[0].total;
+  }
 }

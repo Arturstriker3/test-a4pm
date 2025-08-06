@@ -6,7 +6,7 @@ import { getRouteAccess, getAccessRoles, RouteAccessType } from "../modules/auth
 import { AuthMiddleware, JwtPayload } from "../common/middlewares/auth.middleware";
 import { UserRole } from "../modules/users/entities/user.entity";
 import { getMethodMetadata } from "../common/decorators/swagger.decorators";
-import { getParamMetadata } from "../common/decorators/param.decorator";
+import { getParamMetadata, getQueryMetadata } from "../common/decorators/param.decorator";
 import { getCurrentUserMetadata } from "../common/decorators/current-user.decorator";
 import { ValidationException } from "../common/exceptions";
 import { ApiResponse } from "../common/responses";
@@ -213,7 +213,7 @@ function extractMethodParameters(request: FastifyRequest, methodName: string): a
 }
 
 /**
- * Extrai e valida parâmetros usando decorators @Param
+ * Extrai e valida parâmetros usando decorators @Param, @Query e @CurrentUser
  * Nova funcionalidade similar ao NestJS
  */
 async function extractParametersWithDecorators(
@@ -222,9 +222,10 @@ async function extractParametersWithDecorators(
   methodName: string
 ): Promise<any[]> {
   const paramMetadata = getParamMetadata(controller, methodName);
+  const queryMetadata = getQueryMetadata(controller, methodName);
   const currentUserMetadata = getCurrentUserMetadata(controller, methodName);
 
-  const totalParams = paramMetadata.length + currentUserMetadata.length;
+  const totalParams = paramMetadata.length + (queryMetadata ? 1 : 0) + currentUserMetadata.length;
 
   if (totalParams === 0) {
     // Verifica se o método espera parâmetros mesmo sem decorators
@@ -264,6 +265,26 @@ async function extractParametersWithDecorators(
     } else {
       // Sem validação, apenas passa o valor
       parameters[param.index] = paramValue;
+    }
+  }
+
+  // Processa parâmetros @Query
+  if (queryMetadata) {
+    if (queryMetadata.dtoClass) {
+      // Validar query parameters usando DTO
+      const queryDto = plainToClass(queryMetadata.dtoClass, request.query || {});
+      const errors = await validate(queryDto);
+
+      if (errors.length > 0) {
+        const firstError = errors[0];
+        const message = Object.values(firstError.constraints || {})[0] || "Erro de validação nos query parameters";
+        throw new ValidationException(message);
+      }
+
+      parameters[queryMetadata.index] = queryDto;
+    } else {
+      // Sem validação, passa o objeto query inteiro
+      parameters[queryMetadata.index] = request.query;
     }
   }
 

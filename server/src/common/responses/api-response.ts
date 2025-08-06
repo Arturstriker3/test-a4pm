@@ -1,4 +1,5 @@
 import { HttpMessages } from "./http-status";
+import { PaginatedData, PaginatedDataBuilder } from "./paginated-data";
 
 /**
  * Classe de resposta padronizada para toda a aplicação
@@ -97,6 +98,32 @@ export class ApiResponse<T = any> {
   static custom<T>(code: number, data: T | null = null, message?: string): ApiResponse<T> {
     const defaultMessage = HttpMessages[code as keyof typeof HttpMessages] || `Status ${code}`;
     return new ApiResponse(code, message || defaultMessage, data);
+  }
+
+  /**
+   * Criar uma resposta de sucesso com dados paginados
+   */
+  static paginated<T>(
+    items: T[],
+    currentPage: number,
+    itemsPerPage: number,
+    totalItems: number,
+    message?: string
+  ): ApiResponse<PaginatedData<T>> {
+    const paginatedData = PaginatedDataBuilder.create(items, currentPage, itemsPerPage, totalItems);
+    return new ApiResponse(200, message || HttpMessages[200], paginatedData);
+  }
+
+  /**
+   * Criar uma resposta de sucesso com dados paginados vazios
+   */
+  static emptyPaginated<T>(
+    currentPage: number = 1,
+    itemsPerPage: number = 10,
+    message?: string
+  ): ApiResponse<PaginatedData<T>> {
+    const paginatedData = PaginatedDataBuilder.empty<T>(currentPage, itemsPerPage);
+    return new ApiResponse(200, message || "Nenhum resultado encontrado", paginatedData);
   }
 
   /**
