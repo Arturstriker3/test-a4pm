@@ -15,12 +15,12 @@ const shouldUseLayout = computed(() => {
 </script>
 
 <template>
-  <v-app>
-    <DefaultLayout v-if="shouldUseLayout">
-      <RouterView />
-    </DefaultLayout>
-    
-    <v-main v-else>
+  <DefaultLayout v-if="shouldUseLayout">
+    <RouterView />
+  </DefaultLayout>
+  
+  <v-app v-else>
+    <v-main>
       <RouterView />
     </v-main>
   </v-app>

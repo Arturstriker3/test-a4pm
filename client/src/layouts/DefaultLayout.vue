@@ -212,9 +212,9 @@
 
     <!-- Main Content -->
     <v-main>
-      <v-container fluid>
+      <div class="content-wrapper">
         <router-view />
-      </v-container>
+      </div>
     </v-main>
 
     <!-- Notifications -->
@@ -278,6 +278,12 @@ watch(() => route.path, () => {
 </script>
 
 <style scoped>
+/* Simple scroll fix */
+.content-wrapper {
+  padding: 24px;
+}
+
+/* Mobile Sidebar Styles */
 .cursor-pointer {
   cursor: pointer;
 }
