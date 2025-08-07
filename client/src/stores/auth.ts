@@ -2,41 +2,16 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import api from "@/plugins/axios";
 import { CookieService } from "@/services/cookie.service";
-
-interface User {
-  id: string;
-  nome: string;
-  login: string;
-  nivel_acesso: string;
-}
-
-interface LoginCredentials {
-  login: string;
-  senha: string;
-}
-
-interface RegisterData {
-  nome: string;
-  login: string;
-  senha: string;
-}
+import type { User, LoginCredentials, RegisterData } from "@/types";
 
 export const useAuthStore = defineStore("auth", () => {
-  // State
   const user = ref<User | null>(null);
   const token = ref<string | null>(CookieService.getAuthToken());
   const isLoading = ref(false);
 
-  // Getters
   const isAuthenticated = computed(() => !!token.value && !!user.value);
-  const isAdmin = computed(
-    () =>
-      user.value?.nivel_acesso === "ADMIN" ||
-      user.value?.nivel_acesso === "admin" ||
-      (user.value as any)?.role === "ADMIN"
-  );
+  const isAdmin = computed(() => user.value?.nivel_acesso === "ADMIN");
 
-  // Actions
   const login = async (credentials: LoginCredentials) => {
     isLoading.value = true;
     try {
@@ -49,12 +24,12 @@ export const useAuthStore = defineStore("auth", () => {
         role,
       } = response.data.data;
 
-      // Mapear a resposta da API para o formato esperado
-      const userData = {
+      const userData: User = {
         id: userId,
         nome: nome,
-        login: email, // Usando email como login
-        nivel_acesso: role === "ADMIN" ? "ADMIN" : "DEFAULT",
+        login: email,
+        nivel_acesso:
+          role === "ADMIN" ? ("ADMIN" as const) : ("DEFAULT" as const),
       };
 
       token.value = authToken;
@@ -84,12 +59,12 @@ export const useAuthStore = defineStore("auth", () => {
         role,
       } = response.data.data;
 
-      // Mapear a resposta da API para o formato esperado
-      const userData = {
+      const userData: User = {
         id: userId,
         nome: nome,
-        login: email, // Usando email como login
-        nivel_acesso: role === "ADMIN" ? "ADMIN" : "DEFAULT",
+        login: email,
+        nivel_acesso:
+          role === "ADMIN" ? ("ADMIN" as const) : ("DEFAULT" as const),
       };
 
       token.value = authToken;
@@ -141,7 +116,6 @@ export const useAuthStore = defineStore("auth", () => {
       const response = await api.get("/users/me");
       const { id, nome, email, role } = response.data.data;
 
-      // Mapear resposta da API para o formato esperado
       user.value = {
         id: id,
         nome: nome,
@@ -155,16 +129,13 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   return {
-    // State
     user,
     token,
     isLoading,
 
-    // Getters
     isAuthenticated,
     isAdmin,
 
-    // Actions
     login,
     register,
     logout,

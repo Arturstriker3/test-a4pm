@@ -1,43 +1,14 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import api from "@/plugins/axios";
-
-interface Recipe {
-  id: string;
-  nome: string;
-  ingredientes: string;
-  modo_preparo: string;
-  tempo_preparo: number;
-  porcoes: number;
-  id_categorias: string;
-  categoria_nome: string;
-  id_usuarios: string;
-  usuario_nome: string;
-  criado_em: string;
-  alterado_em: string;
-}
-
-interface CreateRecipeData {
-  nome: string;
-  ingredientes: string;
-  modo_preparo: string;
-  tempo_preparo: number;
-  porcoes: number;
-  id_categorias: string;
-}
-
-interface UpdateRecipeData extends Partial<CreateRecipeData> {}
-
-interface PaginatedResponse<T> {
-  data: T[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
+import type {
+  Recipe,
+  CreateRecipeData,
+  UpdateRecipeData,
+  PaginatedResponse,
+} from "@/types";
 
 export const useRecipesStore = defineStore("recipes", () => {
-  // State
   const recipes = ref<Recipe[]>([]);
   const currentRecipe = ref<Recipe | null>(null);
   const isLoading = ref(false);
@@ -48,7 +19,6 @@ export const useRecipesStore = defineStore("recipes", () => {
     totalPages: 0,
   });
 
-  // Actions
   const fetchRecipes = async (page = 1, limit = 10) => {
     isLoading.value = true;
     try {
@@ -94,7 +64,6 @@ export const useRecipesStore = defineStore("recipes", () => {
       const response = await api.post("/recipes", data);
       const newRecipe = response.data.data;
 
-      // Adiciona a nova receita à lista
       recipes.value.unshift(newRecipe);
 
       return { success: true, data: newRecipe };
@@ -114,13 +83,11 @@ export const useRecipesStore = defineStore("recipes", () => {
       const response = await api.patch(`/recipes/${id}`, data);
       const updatedRecipe = response.data.data;
 
-      // Atualiza a receita na lista
       const index = recipes.value.findIndex((recipe) => recipe.id === id);
       if (index !== -1) {
         recipes.value[index] = updatedRecipe;
       }
 
-      // Atualiza a receita atual se for a mesma
       if (currentRecipe.value?.id === id) {
         currentRecipe.value = updatedRecipe;
       }
@@ -141,10 +108,8 @@ export const useRecipesStore = defineStore("recipes", () => {
     try {
       await api.delete(`/recipes/${id}`);
 
-      // Remove a receita da lista
       recipes.value = recipes.value.filter((recipe) => recipe.id !== id);
 
-      // Limpa a receita atual se for a mesma
       if (currentRecipe.value?.id === id) {
         currentRecipe.value = null;
       }
@@ -175,13 +140,11 @@ export const useRecipesStore = defineStore("recipes", () => {
   };
 
   return {
-    // State
     recipes,
     currentRecipe,
     isLoading,
     pagination,
 
-    // Actions
     fetchRecipes,
     fetchRecipeById,
     createRecipe,

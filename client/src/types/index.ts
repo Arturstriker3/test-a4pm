@@ -12,7 +12,6 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// Tipos de usuário
 export interface User {
   id: string;
   nome: string;
@@ -36,7 +35,6 @@ export interface LoginResponse {
   user: User;
 }
 
-// Tipos de receita
 export interface Recipe {
   id: string;
   nome: string;
@@ -63,13 +61,11 @@ export interface CreateRecipeData {
 
 export interface UpdateRecipeData extends Partial<CreateRecipeData> {}
 
-// Tipos de categoria
 export interface Category {
   id: string;
   nome: string;
 }
 
-// Tipos de formulários
 export interface FormField {
   name: string;
   label: string;
@@ -85,7 +81,6 @@ export interface FormField {
   };
 }
 
-// Tipos de notificação
 export interface Notification {
   id: string;
   type: "success" | "error" | "warning" | "info";
@@ -94,12 +89,10 @@ export interface Notification {
   duration?: number;
 }
 
-// Tipos de loading
 export interface LoadingState {
   [key: string]: boolean;
 }
 
-// Tipos de filtros
 export interface RecipeFilters {
   search?: string;
   categoria?: string;
@@ -108,4 +101,11 @@ export interface RecipeFilters {
   tempo_preparo_max?: number;
   porcoes_min?: number;
   porcoes_max?: number;
+}
+
+export interface StatCard {
+  title: string;
+  value: string | number;
+  icon: string;
+  iconClass: string;
 }

@@ -132,11 +132,12 @@
 import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRecipesStore } from '@/stores/recipes'
+import type { Recipe, StatCard } from '@/types'
 
 const isLoading = ref(false)
-const recentRecipes = ref([])
+const recentRecipes = ref<Recipe[]>([])
 
-const stats = ref([
+const stats = ref<StatCard[]>([
   {
     title: 'Total de Receitas',
     value: '12',

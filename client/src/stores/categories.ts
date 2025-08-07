@@ -8,16 +8,15 @@ interface Category {
 }
 
 export const useCategoriesStore = defineStore("categories", () => {
-  // State
+
   const categories = ref<Category[]>([]);
   const isLoading = ref(false);
 
-  // Actions
   const fetchCategories = async () => {
     isLoading.value = true;
     try {
       const response = await api.get("/categories", {
-        params: { limit: 100 }, // Busca todas as categorias
+        params: { limit: 100 },
       });
 
       categories.value = response.data.data.data;
@@ -43,11 +42,9 @@ export const useCategoriesStore = defineStore("categories", () => {
   };
 
   return {
-    // State
     categories,
     isLoading,
 
-    // Actions
     fetchCategories,
     getCategoryById,
     getCategoryName,
