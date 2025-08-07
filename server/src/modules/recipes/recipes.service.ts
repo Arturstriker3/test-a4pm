@@ -30,8 +30,8 @@ export class RecipesService {
 		return await this.updateRecipeUseCase.execute(recipeId, updateRecipeDto, userId, userRole);
 	}
 
-	async findAllPaginated(page: number, limit: number, offset: number, userId: string, userRole: UserRole): Promise<{ items: RecipeDto[]; total: number }> {
-		return await this.getRecipesPaginatedUseCase.execute(page, limit, offset, userId, userRole);
+	async findAllPaginated(page: number, limit: number, offset: number, userId: string, userRole: UserRole, search?: string, categoryId?: string): Promise<{ items: RecipeDto[]; total: number }> {
+		return await this.getRecipesPaginatedUseCase.execute(page, limit, offset, userId, userRole, search, categoryId);
 	}
 
 	async deleteRecipe(recipeId: string, userId: string, userRole: UserRole): Promise<Boolean> {

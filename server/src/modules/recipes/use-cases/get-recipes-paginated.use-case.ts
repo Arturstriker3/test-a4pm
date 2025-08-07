@@ -11,11 +11,11 @@ export class GetRecipesPaginatedUseCase {
 		private readonly recipesRepository: RecipesRepository
 	) {}
 
-	async execute(page: number, limit: number, offset: number, userId: string, userRole: UserRole): Promise<{ items: RecipeDto[]; total: number }> {
+	async execute(page: number, limit: number, offset: number, userId: string, userRole: UserRole, search?: string, categoryId?: string): Promise<{ items: RecipeDto[]; total: number }> {
 		if (userRole === UserRole.ADMIN) {
-			return await this.recipesRepository.findAllPaginated(page, limit, offset);
+			return await this.recipesRepository.findAllPaginated(page, limit, offset, search, categoryId);
 		}
 
-		return await this.recipesRepository.findByUserIdPaginated(userId, page, limit, offset);
+		return await this.recipesRepository.findByUserIdPaginated(userId, page, limit, offset, search, categoryId);
 	}
 }

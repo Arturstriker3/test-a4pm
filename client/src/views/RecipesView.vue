@@ -163,6 +163,20 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <ConfirmDialog
+      v-model="showDeleteConfirm"
+      title="Excluir Receita"
+      message="Tem certeza que deseja excluir esta receita?"
+      description="Esta ação não pode ser desfeita. A receita será permanentemente removida."
+      confirm-text="Excluir"
+      cancel-text="Cancelar"
+      type="danger"
+      :is-loading="deletingRecipe"
+      @confirm="confirmDeleteRecipe"
+      @cancel="cancelDeleteRecipe"
+    />
   </div>
 </template>
 
@@ -172,11 +186,17 @@ import { useRouter } from 'vue-router'
 import { useRecipesStore } from '@/stores/recipes'
 import { useCategoriesStore } from '@/stores/categories'
 import { useNotifications } from '@/composables/useNotifications'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 const searchQuery = ref('')
 const selectedCategory = ref(null)
 const currentPage = ref(1)
 const itemsPerPage = 12
+
+// Modal de confirmação
+const showDeleteConfirm = ref(false)
+const recipeToDelete = ref<string | null>(null)
+const deletingRecipe = ref(false)
 
 const recipesStore = useRecipesStore()
 const categoriesStore = useCategoriesStore()
@@ -198,7 +218,12 @@ const categoryItems = computed(() => [
 ])
 
 const loadRecipes = async () => {
-  await recipesStore.fetchRecipes(currentPage.value, itemsPerPage)
+  await recipesStore.fetchRecipes(
+    currentPage.value, 
+    itemsPerPage, 
+    searchQuery.value,
+    selectedCategory.value || undefined
+  )
 }
 
 const handleSearch = () => {
@@ -220,16 +245,32 @@ const editRecipe = (id: string) => {
   router.push(`/recipes/${id}/edit`)
 }
 
-const deleteRecipe = async (id: string) => {
-  if (confirm('Tem certeza que deseja excluir esta receita?')) {
-    const result = await recipesStore.deleteRecipe(id)
-    if (result.success) {
-      success('Receita excluída', 'A receita foi excluída com sucesso')
-      loadRecipes()
-    } else {
-      error('Erro ao excluir', result.message)
-    }
+const deleteRecipe = (id: string) => {
+  recipeToDelete.value = id
+  showDeleteConfirm.value = true
+}
+
+const confirmDeleteRecipe = async () => {
+  if (!recipeToDelete.value) return
+  
+  deletingRecipe.value = true
+  const result = await recipesStore.deleteRecipe(recipeToDelete.value)
+  
+  if (result.success) {
+    success('Receita excluída', 'A receita foi excluída com sucesso')
+    showDeleteConfirm.value = false
+    recipeToDelete.value = null
+    loadRecipes()
+  } else {
+    error('Erro ao excluir', result.message)
   }
+  
+  deletingRecipe.value = false
+}
+
+const cancelDeleteRecipe = () => {
+  showDeleteConfirm.value = false
+  recipeToDelete.value = null
 }
 
 onMounted(async () => {

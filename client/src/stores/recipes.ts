@@ -19,12 +19,25 @@ export const useRecipesStore = defineStore("recipes", () => {
     totalPages: 0,
   });
 
-  const fetchRecipes = async (page = 1, limit = 10) => {
+  const fetchRecipes = async (
+    page = 1,
+    limit = 10,
+    search?: string,
+    categoryId?: string
+  ) => {
     isLoading.value = true;
     try {
-      const response = await api.get("/recipes", {
-        params: { page, limit },
-      });
+      const params: any = { page, limit };
+
+      if (search && search.trim()) {
+        params.search = search.trim();
+      }
+
+      if (categoryId) {
+        params.categoria_id = categoryId;
+      }
+
+      const response = await api.get("/recipes", { params });
 
       const { items, ...paginationData } = response.data.data;
       recipes.value = items || [];

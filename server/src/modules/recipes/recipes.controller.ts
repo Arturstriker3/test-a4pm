@@ -1,10 +1,9 @@
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../common/types";
 import { RecipesService } from "./recipes.service";
-import { CreateRecipeDto, CreateRecipeResponseDto, UpdateRecipeDto, UpdateRecipeResponseDto, RecipeDto } from "./dto";
+import { CreateRecipeDto, CreateRecipeResponseDto, UpdateRecipeDto, UpdateRecipeResponseDto, RecipeDto, RecipeSearchParamsDto } from "./dto";
 import { Controller, Post, Patch, Get, Delete, Body, Param, Query } from "../../common/decorators";
 import { ApiResponse, PaginatedData } from "../../common/responses";
-import { PaginationParamsDto } from "../../common/dto";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { CurrentUserFull } from "../../common/decorators/current-user-full.decorator";
 import { RouteAccess, RouteAccessType } from "../auth/decorators/access.decorators";
@@ -53,6 +52,20 @@ export class RecipesController {
 		maximum: 100,
 		default: 10,
 	})
+	@ApiQuery({
+		name: "search",
+		type: "string",
+		description: "Termo de busca para pesquisar em nome, ingredientes e modo de preparo",
+		required: false,
+		example: "chocolate",
+	})
+	@ApiQuery({
+		name: "categoria_id",
+		type: "string",
+		description: "ID da categoria para filtrar receitas",
+		required: false,
+		example: "123e4567-e89b-12d3-a456-426614174000",
+	})
 	@ApiSuccessResponse({
 		description: "Lista de receitas retornada com sucesso",
 		dataType: RecipeDto,
@@ -60,9 +73,9 @@ export class RecipesController {
 	@ApiUnauthorizedResponse({
 		messageExample: "Token inválido ou expirado",
 	})
-	async findAll(@Query(PaginationParamsDto) pagination: PaginationParamsDto, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<PaginatedData<RecipeDto>>> {
-		const { items, total } = await this.recipesService.findAllPaginated(pagination.page!, pagination.limit!, pagination.offset, user.userId, user.role as any);
-		return ApiResponse.paginated(items, pagination.page!, pagination.limit!, total, "Lista de receitas retornada com sucesso");
+	async findAll(@Query(RecipeSearchParamsDto) searchParams: RecipeSearchParamsDto, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<PaginatedData<RecipeDto>>> {
+		const { items, total } = await this.recipesService.findAllPaginated(searchParams.page!, searchParams.limit!, searchParams.offset, user.userId, user.role as any, searchParams.search, searchParams.categoria_id);
+		return ApiResponse.paginated(items, searchParams.page!, searchParams.limit!, total, "Lista de receitas retornada com sucesso");
 	}
 
 	@Get("/:id")

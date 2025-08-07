@@ -165,12 +165,30 @@ export class RecipesRepository {
 		return updatedRecipe;
 	}
 
-	async findAllPaginated(page: number, limit: number, offset: number): Promise<{ items: any[]; total: number }> {
+	async findAllPaginated(page: number, limit: number, offset: number, search?: string, categoryId?: string): Promise<{ items: any[]; total: number }> {
 		const connection = await this.databaseService.getConnection();
+
+		// Construir condições WHERE dinamicamente
+		let whereConditions: string[] = [];
+		let queryParams: any[] = [];
+
+		if (search && search.trim()) {
+			whereConditions.push("(r.nome LIKE ? OR r.ingredientes LIKE ? OR r.modo_preparo LIKE ?)");
+			const searchTerm = `%${search.trim()}%`;
+			queryParams.push(searchTerm, searchTerm, searchTerm);
+		}
+
+		if (categoryId) {
+			whereConditions.push("r.id_categorias = ?");
+			queryParams.push(categoryId);
+		}
+
+		const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
 
 		const countQuery = `
       SELECT COUNT(*) as total 
       FROM teste_receitas_rg_sistemas.receitas r
+      ${whereClause}
     `;
 
 		const dataQuery = `
@@ -190,12 +208,13 @@ export class RecipesRepository {
       FROM teste_receitas_rg_sistemas.receitas r
       LEFT JOIN teste_receitas_rg_sistemas.categorias c ON r.id_categorias = c.id
       LEFT JOIN teste_receitas_rg_sistemas.usuarios u ON r.id_usuarios = u.id
+      ${whereClause}
       ORDER BY r.criado_em DESC
       LIMIT ? OFFSET ?
     `;
 
-		const [countResult] = await connection.execute(countQuery);
-		const [dataResult] = await connection.execute(dataQuery, [limit, offset]);
+		const [countResult] = await connection.execute(countQuery, queryParams);
+		const [dataResult] = await connection.execute(dataQuery, [...queryParams, limit, offset]);
 
 		const total = (countResult as any[])[0].total;
 		const items = dataResult as any[];
@@ -203,13 +222,30 @@ export class RecipesRepository {
 		return { items, total };
 	}
 
-	async findByUserIdPaginated(userId: string, page: number, limit: number, offset: number): Promise<{ items: any[]; total: number }> {
+	async findByUserIdPaginated(userId: string, page: number, limit: number, offset: number, search?: string, categoryId?: string): Promise<{ items: any[]; total: number }> {
 		const connection = await this.databaseService.getConnection();
+
+		// Construir condições WHERE dinamicamente
+		let whereConditions: string[] = ["r.id_usuarios = ?"];
+		let queryParams: any[] = [userId];
+
+		if (search && search.trim()) {
+			whereConditions.push("(r.nome LIKE ? OR r.ingredientes LIKE ? OR r.modo_preparo LIKE ?)");
+			const searchTerm = `%${search.trim()}%`;
+			queryParams.push(searchTerm, searchTerm, searchTerm);
+		}
+
+		if (categoryId) {
+			whereConditions.push("r.id_categorias = ?");
+			queryParams.push(categoryId);
+		}
+
+		const whereClause = `WHERE ${whereConditions.join(" AND ")}`;
 
 		const countQuery = `
       SELECT COUNT(*) as total 
       FROM teste_receitas_rg_sistemas.receitas r
-      WHERE r.id_usuarios = ?
+      ${whereClause}
     `;
 
 		const dataQuery = `
@@ -229,13 +265,13 @@ export class RecipesRepository {
       FROM teste_receitas_rg_sistemas.receitas r
       LEFT JOIN teste_receitas_rg_sistemas.categorias c ON r.id_categorias = c.id
       LEFT JOIN teste_receitas_rg_sistemas.usuarios u ON r.id_usuarios = u.id
-      WHERE r.id_usuarios = ?
+      ${whereClause}
       ORDER BY r.criado_em DESC
       LIMIT ? OFFSET ?
     `;
 
-		const [countResult] = await connection.execute(countQuery, [userId]);
-		const [dataResult] = await connection.execute(dataQuery, [userId, limit, offset]);
+		const [countResult] = await connection.execute(countQuery, queryParams);
+		const [dataResult] = await connection.execute(dataQuery, [...queryParams, limit, offset]);
 
 		const total = (countResult as any[])[0].total;
 		const items = dataResult as any[];
