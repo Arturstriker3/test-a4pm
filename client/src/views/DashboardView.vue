@@ -5,7 +5,7 @@
         <v-col cols="12">
           <div class="welcome-header">
             <h1 class="text-h3 font-weight-bold mb-2">
-              Olá, {{ user?.nome }}! 👋
+              Olá, {{ user?.nome }}!
             </h1>
             <p class="text-h6 text-medium-emphasis">
               Bem-vindo de volta ao seu ChefBook

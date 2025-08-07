@@ -28,7 +28,7 @@ import { JwtPayload } from "../../common/middlewares/auth.middleware";
 export class RecipesController {
 	constructor(@inject(TYPES.RecipesService) private readonly recipesService: RecipesService) {}
 
-	@Get("/")
+	@Get()
 	@RouteAccess(RouteAccessType.AUTHENTICATED)
 	@ApiOperation({
 		summary: "Listar receitas com paginação",

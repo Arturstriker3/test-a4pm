@@ -7,7 +7,6 @@ import { ApiResponse, PaginatedData } from "../../common/responses";
 import { PaginationParamsDto } from "../../common/dto";
 import { HandleClassExceptions, ApiOperation, ApiSuccessResponse, ApiUnauthorizedResponse, ApiQuery } from "../../common/decorators";
 import { UserProfileDto } from "./dto/user-profile.dto";
-import { JwtPayload } from "../../common/middlewares";
 import { UserRole } from "./entities/user.entity";
 
 @injectable()
@@ -16,7 +15,7 @@ import { UserRole } from "./entities/user.entity";
 export class UsersController {
 	constructor(@inject(TYPES.UsersService) private readonly usersService: UsersService) {}
 
-	@Get("/")
+	@Get()
 	@RouteAccess(RouteAccessType.AUTHENTICATED)
 	@AccessTo(UserRole.ADMIN)
 	@ApiOperation({
@@ -67,8 +66,7 @@ export class UsersController {
 	@ApiUnauthorizedResponse({
 		messageExample: "Token inválido ou expirado",
 	})
-	async getMe(@CurrentUser() user: JwtPayload): Promise<ApiResponse<UserProfileDto>> {
-		const userId = user.userId;
+	async getMe(@CurrentUser() userId: string): Promise<ApiResponse<UserProfileDto>> {
 		const response = await this.usersService.getUserById(userId);
 		return ApiResponse.success(response, "Dados do usuário autenticado retornados com sucesso");
 	}

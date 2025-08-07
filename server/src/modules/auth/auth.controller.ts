@@ -4,6 +4,7 @@ import { AuthService } from "./auth.service";
 import { RegisterDto, RegisterResponseDto, LoginDto, LoginResponseDto, RefreshTokenDto, TokenResponseDto } from "./dto";
 import { RouteAccess, AccessTo, RouteAccessType } from "./decorators/access.decorators";
 import { Controller, Post, Param } from "../../common/decorators";
+import { CurrentUser } from "../../common/decorators";
 import { ApiResponse } from "../../common/responses";
 import { HandleClassExceptions, ApiOperation, ApiBody, ApiCreatedResponse, ApiSuccessResponse, ApiBadRequestResponse, ApiUnauthorizedResponse } from "../../common/decorators";
 import { UserIdDto } from "../users/dto/id.dto";
@@ -92,6 +93,22 @@ export class AuthController {
 	})
 	async logout(@Param("id", UserIdDto) id: string): Promise<ApiResponse<null>> {
 		const userIdDto: UserIdDto = { id: id };
+		await this.authService.logout(userIdDto);
+		return ApiResponse.success(null, "Logout realizado com sucesso");
+	}
+
+	@Post("/logout")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	@ApiOperation({
+		summary: "Logout do usuário (seguro)",
+		description: "Remove o recovery token do usuário logado usando token JWT.",
+	})
+	@ApiSuccessResponse({
+		description: "Logout realizado com sucesso",
+		dataType: null,
+	})
+	async logoutSecure(@CurrentUser() userId: string): Promise<ApiResponse<null>> {
+		const userIdDto: UserIdDto = { id: userId };
 		await this.authService.logout(userIdDto);
 		return ApiResponse.success(null, "Logout realizado com sucesso");
 	}

@@ -17,7 +17,7 @@ export class CategoriesController {
 		private readonly categoriesService: CategoriesService
 	) {}
 
-	@Get("/")
+	@Get()
 	@RouteAccess(RouteAccessType.AUTHENTICATED)
 	@ApiOperation({
 		summary: "Listar categorias com paginação",
