@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsInt, IsPositive, IsUUID } from "class-validator";
+import { Expose } from "class-transformer";
 import { SchemaProperty, SchemaClass } from "../../../common/decorators";
 
 @SchemaClass({
@@ -7,6 +8,7 @@ import { SchemaProperty, SchemaClass } from "../../../common/decorators";
 export class UpdateRecipeDto {
 	@IsString()
 	@IsOptional()
+	@Expose()
 	@SchemaProperty({
 		description: "Nome da receita",
 		example: "Bolo de Chocolate com Cobertura Especial",
@@ -16,6 +18,7 @@ export class UpdateRecipeDto {
 
 	@IsUUID("all", { message: "ID da categoria deve ser um UUID válido" })
 	@IsOptional()
+	@Expose()
 	@SchemaProperty({
 		description: "ID da categoria da receita - Use o endpoint GET /categories para obter IDs válidos",
 		format: "uuid",
@@ -26,6 +29,7 @@ export class UpdateRecipeDto {
 	@IsInt({ message: "Tempo de preparo deve ser um número inteiro" })
 	@IsPositive({ message: "Tempo de preparo deve ser positivo" })
 	@IsOptional()
+	@Expose()
 	@SchemaProperty({
 		type: "number",
 		description: "Tempo de preparo em minutos",
@@ -37,6 +41,7 @@ export class UpdateRecipeDto {
 	@IsInt({ message: "Número de porções deve ser um número inteiro" })
 	@IsPositive({ message: "Número de porções deve ser positivo" })
 	@IsOptional()
+	@Expose()
 	@SchemaProperty({
 		type: "number",
 		description: "Número de porções que a receita rende",
@@ -47,6 +52,7 @@ export class UpdateRecipeDto {
 
 	@IsString()
 	@IsOptional()
+	@Expose()
 	@SchemaProperty({
 		description: "Instruções detalhadas de como preparar a receita",
 		example:
@@ -57,6 +63,7 @@ export class UpdateRecipeDto {
 
 	@IsString()
 	@IsOptional()
+	@Expose()
 	@SchemaProperty({
 		description: "Lista detalhada de ingredientes necessários",
 		example:

@@ -355,6 +355,7 @@ onMounted(async () => {
   }
 }
 
+// Form specific styles
 :deep(.v-field) {
   border-radius: 12px;
 }
@@ -365,6 +366,7 @@ onMounted(async () => {
   font-weight: 600;
 }
 
+// Mobile adjustments
 @media (max-width: 599px) {
   .edit-recipe-page {
     .v-container {
@@ -374,6 +376,18 @@ onMounted(async () => {
     
     .recipe-form-card .v-card-text {
       padding: 24px 16px !important;
+    }
+
+    // Ajustes dos botões para mobile
+    .v-row:last-child .v-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      
+      .v-btn {
+        width: 100%;
+        margin: 0 !important;
+      }
     }
   }
 }

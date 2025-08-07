@@ -278,8 +278,14 @@ async function extractParametersWithDecorators(request: FastifyRequest, controll
 	for (const body of bodyMetadata) {
 		if (body.dtoClass) {
 			// Validar body usando DTO
-			const bodyDto = plainToClass(body.dtoClass, request.body || {});
-			const errors = await validate(bodyDto as object);
+			const bodyDto = plainToClass(body.dtoClass, request.body || {}, {
+				excludeExtraneousValues: true,
+				exposeUnsetFields: false,
+			});
+			const errors = await validate(bodyDto as object, {
+				whitelist: true,
+				forbidNonWhitelisted: true,
+			});
 
 			if (errors.length > 0) {
 				const firstError = errors[0];
