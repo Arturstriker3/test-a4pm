@@ -93,33 +93,13 @@
               v-for="recipe in recentRecipes"
               :key="recipe.id"
             >
-              <v-card class="recipe-card" elevation="2" hover>
-                <v-card-text class="pa-4">
-                  <h4 class="text-h6 font-weight-medium mb-2">
-                    {{ recipe.nome }}
-                  </h4>
-                  <div class="recipe-meta mb-3">
-                    <v-chip size="small" color="primary" class="mr-2">
-                      {{ recipe.categoria_nome }}
-                    </v-chip>
-                    <span class="text-caption text-medium-emphasis">
-                      {{ recipe.tempo_preparo }} min
-                    </span>
-                  </div>
-                  <p class="text-body-2 text-medium-emphasis recipe-description">
-                    {{ recipe.ingredientes.substring(0, 100) }}...
-                  </p>
-                </v-card-text>
-                <v-card-actions>
-                  <v-btn
-                    :to="`/recipes/${recipe.id}`"
-                    variant="text"
-                    color="primary"
-                  >
-                    Ver receita
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
+              <RecipeCard
+                :recipe="recipe"
+                :compact="true"
+                :show-actions="false"
+                :show-author="false"
+                @toggle-favorite="toggleFavorite"
+              />
             </v-col>
           </v-row>
         </v-col>
@@ -132,6 +112,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRecipesStore } from '@/stores/recipes'
+import RecipeCard from '@/components/RecipeCard.vue'
 import type { Recipe, StatCard } from '@/types'
 
 const isLoading = ref(false)
@@ -177,6 +158,11 @@ const loadRecentRecipes = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const toggleFavorite = (recipeId: string) => {
+  // TODO: Implementar sistema de favoritos
+  console.log('Toggle favorite for recipe:', recipeId)
 }
 
 onMounted(() => {
@@ -232,25 +218,6 @@ onMounted(() => {
       flex-direction: column;
       gap: $spacing-sm;
     }
-  }
-
-  .recipe-card {
-    border-radius: 12px;
-    transition: transform 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-    }
-  }
-
-  .recipe-meta {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-  }
-
-  .recipe-description {
-    line-height: 1.5;
   }
 
   /* Mobile specific styles */

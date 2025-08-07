@@ -75,81 +75,12 @@
           v-for="recipe in recipes"
           :key="recipe.id"
         >
-          <v-card class="recipe-card" elevation="2" hover>
-            <v-card-text class="pa-4">
-              <div class="recipe-header mb-3">
-                <h3 class="text-h6 font-weight-medium">{{ recipe.nome }}</h3>
-                <v-menu>
-                  <template v-slot:activator="{ props }">
-                    <v-btn
-                      v-bind="props"
-                      icon="mdi-dots-vertical"
-                      size="small"
-                      variant="text"
-                    />
-                  </template>
-                  <v-list>
-                    <v-list-item @click="editRecipe(recipe.id)">
-                      <v-list-item-title>
-                        <v-icon icon="mdi-pencil" class="mr-2" />
-                        Editar
-                      </v-list-item-title>
-                    </v-list-item>
-                    <v-list-item @click="deleteRecipe(recipe.id)">
-                      <v-list-item-title class="text-error">
-                        <v-icon icon="mdi-delete" class="mr-2" />
-                        Excluir
-                      </v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </div>
-
-              <div class="recipe-meta mb-3">
-                <v-chip size="small" color="primary" class="mr-2">
-                  {{ recipe.categoria_nome }}
-                </v-chip>
-                <div class="recipe-info">
-                  <span class="text-caption text-medium-emphasis">
-                    <v-icon icon="mdi-clock-outline" size="16" class="mr-1" />
-                    {{ recipe.tempo_preparo_minutos }} min
-                  </span>
-                  <span class="text-caption text-medium-emphasis ml-3">
-                    <v-icon icon="mdi-account-group" size="16" class="mr-1" />
-                    {{ recipe.porcoes }} porções
-                  </span>
-                </div>
-              </div>
-
-              <p class="text-body-2 text-medium-emphasis recipe-preview">
-                {{ recipe.ingredientes.substring(0, 120) }}...
-              </p>
-
-              <div class="recipe-footer mt-3">
-                <span class="text-caption text-medium-emphasis">
-                  Por {{ recipe.usuario_nome }}
-                </span>
-              </div>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-btn
-                :to="`/recipes/${recipe.id}`"
-                variant="text"
-                color="primary"
-                prepend-icon="mdi-eye"
-              >
-                Ver receita
-              </v-btn>
-              <v-spacer />
-              <v-btn
-                icon="mdi-heart-outline"
-                variant="text"
-                color="grey"
-                size="small"
-              />
-            </v-card-actions>
-          </v-card>
+          <RecipeCard
+            :recipe="recipe"
+            @edit="editRecipe"
+            @delete="deleteRecipe"
+            @toggle-favorite="toggleFavorite"
+          />
         </v-col>
       </v-row>
 
@@ -187,6 +118,7 @@ import { useRecipesStore } from '@/stores/recipes'
 import { useCategoriesStore } from '@/stores/categories'
 import { useNotifications } from '@/composables/useNotifications'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import RecipeCard from '@/components/RecipeCard.vue'
 
 const searchQuery = ref('')
 const selectedCategory = ref(null)
@@ -273,6 +205,11 @@ const cancelDeleteRecipe = () => {
   recipeToDelete.value = null
 }
 
+const toggleFavorite = (recipeId: string) => {
+  // TODO: Implementar sistema de favoritos
+  console.log('Toggle favorite for recipe:', recipeId)
+}
+
 onMounted(async () => {
   // Reset do estado do store para evitar problemas de cache
   recipesStore.clearRecipes();
@@ -289,42 +226,6 @@ onMounted(async () => {
   .page-header {
     text-align: center;
     padding: $spacing-xl 0;
-  }
-
-  .recipe-card {
-    border-radius: 12px;
-    transition: transform 0.2s ease;
-    height: 100%;
-
-    &:hover {
-      transform: translateY(-4px);
-    }
-  }
-
-  .recipe-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-
-  .recipe-meta {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-xs;
-  }
-
-  .recipe-info {
-    display: flex;
-    align-items: center;
-  }
-
-  .recipe-preview {
-    line-height: 1.5;
-  }
-
-  .recipe-footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-    padding-top: $spacing-sm;
   }
 }
 </style>
