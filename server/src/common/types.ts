@@ -15,7 +15,6 @@ export const TYPES = {
 	UsersController: Symbol.for("UsersController"),
 	UsersRepository: Symbol.for("UsersRepository"),
 	GetUserByIdUseCase: Symbol.for("GetUserByIdUseCase"),
-	GetUserByTokenUseCase: Symbol.for("GetUserByTokenUseCase"),
 
 	// Categories Module
 	CategoriesService: Symbol.for("CategoriesService"),

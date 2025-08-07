@@ -16,7 +16,6 @@ import { RefreshUserUseCase } from "../modules/auth/use-cases/refresh.use-case";
 import { UsersService } from "../modules/users/users.service";
 import { UsersController } from "../modules/users/users.controller";
 import { UsersRepository } from "../modules/users/users.repository";
-import { GetUserByTokenUseCase } from "../modules/users/use-cases/get-user-by-token.use-case";
 import { GetUserByIdUseCase } from "../modules/users/use-cases/get-user-by-id.use-case";
 
 // Categories Module
