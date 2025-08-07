@@ -4,24 +4,26 @@ import { CreateRecipeDto, CreateRecipeResponseDto, UpdateRecipeDto, UpdateRecipe
 import { CreateRecipeUseCase } from "./use-cases/create-recipe.use-case";
 import { UpdateRecipeUseCase } from "./use-cases/update-recipe.use-case";
 import { GetRecipesPaginatedUseCase } from "./use-cases/get-recipes-paginated.use-case";
+import { GetRecipeByIdUseCase } from "./use-cases/get-recipe-by-id.use-case";
 import { DeleteRecipeUseCase } from "./use-cases/delete-recipe.use-case";
 import { UserRole } from "../users/entities/user.entity";
 
 @injectable()
 export class RecipesService {
 	constructor(
-		@inject(TYPES.CreateRecipeUseCase)
-		private readonly createRecipeUseCase: CreateRecipeUseCase,
-		@inject(TYPES.UpdateRecipeUseCase)
-		private readonly updateRecipeUseCase: UpdateRecipeUseCase,
-		@inject(TYPES.GetRecipesPaginatedUseCase)
-		private readonly getRecipesPaginatedUseCase: GetRecipesPaginatedUseCase,
-		@inject(TYPES.DeleteRecipeUseCase)
-		private readonly deleteRecipeUseCase: DeleteRecipeUseCase
+		@inject(TYPES.CreateRecipeUseCase) private createRecipeUseCase: CreateRecipeUseCase,
+		@inject(TYPES.UpdateRecipeUseCase) private updateRecipeUseCase: UpdateRecipeUseCase,
+		@inject(TYPES.GetRecipesPaginatedUseCase) private getRecipesPaginatedUseCase: GetRecipesPaginatedUseCase,
+		@inject(TYPES.GetRecipeByIdUseCase) private getRecipeByIdUseCase: GetRecipeByIdUseCase,
+		@inject(TYPES.DeleteRecipeUseCase) private deleteRecipeUseCase: DeleteRecipeUseCase
 	) {}
 
 	async createRecipe(createRecipeDto: CreateRecipeDto, userId: string): Promise<CreateRecipeResponseDto> {
 		return await this.createRecipeUseCase.execute(createRecipeDto, userId);
+	}
+
+	async getRecipeById(recipeId: string, userId: string, userRole: UserRole): Promise<RecipeDto> {
+		return await this.getRecipeByIdUseCase.execute(recipeId, userId, userRole);
 	}
 
 	async updateRecipe(recipeId: string, updateRecipeDto: UpdateRecipeDto, userId: string, userRole: UserRole): Promise<UpdateRecipeResponseDto> {
@@ -34,6 +36,6 @@ export class RecipesService {
 
 	async deleteRecipe(recipeId: string, userId: string, userRole: UserRole): Promise<Boolean> {
 		await this.deleteRecipeUseCase.execute(recipeId, userId, userRole);
-    return true;
+		return true;
 	}
 }

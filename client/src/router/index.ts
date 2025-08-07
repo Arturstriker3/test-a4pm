@@ -38,6 +38,18 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/recipes/create",
+      name: "recipes-create",
+      component: () => import("../views/CreateRecipeView.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/recipes/:id/edit",
+      name: "recipes-edit",
+      component: () => import("../views/EditRecipeView.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/about",
       name: "about",
       component: () => import("../views/AboutView.vue"),

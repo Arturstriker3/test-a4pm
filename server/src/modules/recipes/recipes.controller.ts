@@ -65,6 +65,30 @@ export class RecipesController {
 		return ApiResponse.paginated(items, pagination.page!, pagination.limit!, total, "Lista de receitas retornada com sucesso");
 	}
 
+	@Get("/:id")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	@ApiOperation({
+		summary: "Buscar receita por ID",
+		description: "Retorna uma receita específica. Usuários normais só podem ver suas próprias receitas, administradores podem ver qualquer receita.",
+	})
+	@ApiSuccessResponse({
+		description: "Receita encontrada com sucesso",
+		dataType: RecipeDto,
+	})
+	@ApiUnauthorizedResponse({
+		messageExample: "Token inválido ou expirado",
+	})
+	@ApiForbiddenResponse({
+		messageExample: "Você não tem permissão para acessar esta receita",
+	})
+	@ApiNotFoundResponse({
+		messageExample: "Receita não encontrada",
+	})
+	async findById(@Param("id") recipeId: string, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<RecipeDto>> {
+		const recipe = await this.recipesService.getRecipeById(recipeId, user.userId, user.role as any);
+		return ApiResponse.success(recipe, "Receita encontrada com sucesso");
+	}
+
 	@Post()
 	@RouteAccess(RouteAccessType.AUTHENTICATED)
 	@ApiOperation({

@@ -150,8 +150,18 @@
       >
         <div class="mobile-sidebar__content">
           <div class="mobile-sidebar__header">
-            <v-icon icon="mdi-chef-hat" color="white" size="32" />
-            <h3 class="mobile-sidebar__title">Chefibook</h3>
+            <div class="mobile-sidebar__header-left">
+              <v-icon icon="mdi-chef-hat" color="white" size="32" />
+              <h3 class="mobile-sidebar__title">Chefibook</h3>
+            </div>
+            <v-btn
+              icon="mdi-close"
+              variant="text"
+              color="white"
+              size="small"
+              @click="closeSidebar"
+              class="mobile-sidebar__close-btn"
+            />
           </div>
           
           <v-list class="mobile-sidebar__list">
@@ -323,10 +333,25 @@ color: var(--v-theme-primary) !important;
 .mobile-sidebar__header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 24px;
   background: linear-gradient(135deg, #4caf50, #66bb6a);
   color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-sidebar__header-left {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-sidebar__close-btn {
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+}
+
+.mobile-sidebar__close-btn:hover {
+  opacity: 1;
 }
 
 .mobile-sidebar__title {

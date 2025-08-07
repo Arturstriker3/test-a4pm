@@ -60,6 +60,35 @@ export class RecipesRepository {
 		return results.length > 0 ? (results[0] as Recipe) : null;
 	}
 
+	async findByIdWithDetails(id: string): Promise<any | null> {
+		const connection = await this.databaseService.getConnection();
+
+		const query = `
+      SELECT 
+        r.id,
+        r.nome,
+        r.ingredientes,
+        r.modo_preparo,
+        r.tempo_preparo_minutos,
+        r.porcoes,
+        r.id_categorias,
+        r.id_usuarios,
+        r.criado_em,
+        r.alterado_em,
+        c.nome as categoria_nome,
+        u.nome as usuario_nome
+      FROM teste_receitas_rg_sistemas.receitas r
+      LEFT JOIN teste_receitas_rg_sistemas.categorias c ON r.id_categorias = c.id
+      LEFT JOIN teste_receitas_rg_sistemas.usuarios u ON r.id_usuarios = u.id
+      WHERE r.id = ?
+    `;
+
+		const [rows] = await connection.execute(query, [id]);
+		const results = rows as any[];
+
+		return results.length > 0 ? results[0] : null;
+	}
+
 	async findByUserId(userId: string): Promise<Recipe[]> {
 		const connection = await this.databaseService.getConnection();
 

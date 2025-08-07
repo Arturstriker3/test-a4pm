@@ -31,6 +31,7 @@ import { RecipesRepository } from "../modules/recipes/recipes.repository";
 import { CreateRecipeUseCase } from "../modules/recipes/use-cases/create-recipe.use-case";
 import { UpdateRecipeUseCase } from "../modules/recipes/use-cases/update-recipe.use-case";
 import { GetRecipesPaginatedUseCase } from "../modules/recipes/use-cases/get-recipes-paginated.use-case";
+import { GetRecipeByIdUseCase } from "../modules/recipes/use-cases/get-recipe-by-id.use-case";
 import { DeleteRecipeUseCase } from "../modules/recipes/use-cases/delete-recipe.use-case";
 
 const container = new Container();
@@ -64,6 +65,7 @@ container.bind<RecipesRepository>(TYPES.RecipesRepository).to(RecipesRepository)
 container.bind<CreateRecipeUseCase>(TYPES.CreateRecipeUseCase).to(CreateRecipeUseCase);
 container.bind<UpdateRecipeUseCase>(TYPES.UpdateRecipeUseCase).to(UpdateRecipeUseCase);
 container.bind<GetRecipesPaginatedUseCase>(TYPES.GetRecipesPaginatedUseCase).to(GetRecipesPaginatedUseCase);
+container.bind<GetRecipeByIdUseCase>(TYPES.GetRecipeByIdUseCase).to(GetRecipeByIdUseCase);
 container.bind<DeleteRecipeUseCase>(TYPES.DeleteRecipeUseCase).to(DeleteRecipeUseCase);
 container.bind<RecipesService>(TYPES.RecipesService).to(RecipesService);
 container.bind<RecipesController>(TYPES.RecipesController).to(RecipesController);
