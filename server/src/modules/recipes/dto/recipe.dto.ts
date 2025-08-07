@@ -80,4 +80,23 @@ export class RecipeDto {
     example: "2024-01-16T14:20:00.000Z",
   })
   alterado_em!: Date;
+
+  constructor(data?: {
+    id: string;
+    nome: string;
+    ingredientes: string;
+    modo_preparo: string;
+    tempo_preparo: number;
+    porcoes: number;
+    id_categorias: string;
+    categoria_nome: string;
+    id_usuarios: string;
+    usuario_nome: string;
+    criado_em: Date;
+    alterado_em: Date;
+  }) {
+    if (data) {
+      Object.assign(this, data);
+    }
+  }
 }
