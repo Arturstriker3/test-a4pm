@@ -171,7 +171,7 @@ const loadRecentRecipes = async () => {
   isLoading.value = true
   try {
     await recipesStore.fetchRecipes(1, 6)
-    recentRecipes.value = recipesStore.recipes.slice(0, 6)
+    recentRecipes.value = (recipesStore.recipes || []).slice(0, 6)
   } catch (error) {
     console.error('Erro ao carregar receitas:', error)
   } finally {

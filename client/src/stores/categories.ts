@@ -8,7 +8,6 @@ interface Category {
 }
 
 export const useCategoriesStore = defineStore("categories", () => {
-
   const categories = ref<Category[]>([]);
   const isLoading = ref(false);
 
@@ -19,7 +18,7 @@ export const useCategoriesStore = defineStore("categories", () => {
         params: { limit: 100 },
       });
 
-      categories.value = response.data.data.data;
+      categories.value = response.data.data.items || [];
 
       return { success: true };
     } catch (error: any) {

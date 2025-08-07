@@ -48,7 +48,7 @@
         <p class="text-h6 mt-4">Carregando receitas...</p>
       </div>
 
-      <div v-else-if="recipes.length === 0" class="text-center py-12">
+      <div v-else-if="(recipes || []).length === 0" class="text-center py-12">
         <v-icon icon="mdi-chef-hat" size="96" color="grey" class="mb-6" />
         <h2 class="text-h4 font-weight-bold mb-4">
           Nenhuma receita encontrada
@@ -183,13 +183,15 @@ const categoriesStore = useCategoriesStore()
 const router = useRouter()
 const { success, error } = useNotifications()
 
-const recipes = computed(() => recipesStore.recipes)
-const isLoading = computed(() => recipesStore.isLoading)
+const recipes = computed(() => recipesStore.recipes || [])
+const isLoading = computed(() => {
+  return recipesStore.isLoading;
+})
 const totalPages = computed(() => recipesStore.pagination.totalPages)
 
 const categoryItems = computed(() => [
   { title: 'Todas as categorias', value: null },
-  ...categoriesStore.categories.map(cat => ({
+  ...(categoriesStore.categories || []).map(cat => ({
     title: cat.nome,
     value: cat.id
   }))
@@ -231,6 +233,9 @@ const deleteRecipe = async (id: string) => {
 }
 
 onMounted(async () => {
+  // Reset do estado do store para evitar problemas de cache
+  recipesStore.clearRecipes();
+  
   await Promise.all([
     loadRecipes(),
     categoriesStore.fetchCategories()

@@ -26,12 +26,13 @@ export const useRecipesStore = defineStore("recipes", () => {
         params: { page, limit },
       });
 
-      const { data, ...paginationData } = response.data.data;
-      recipes.value = data;
+      const { items, ...paginationData } = response.data.data;
+      recipes.value = items || [];
       pagination.value = paginationData;
 
       return { success: true };
     } catch (error: any) {
+      console.error("Error fetching recipes:", error);
       return {
         success: false,
         message: error.response?.data?.message || "Erro ao buscar receitas",
