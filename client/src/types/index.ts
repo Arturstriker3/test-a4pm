@@ -40,7 +40,7 @@ export interface Recipe {
   nome: string;
   ingredientes: string;
   modo_preparo: string;
-  tempo_preparo: number;
+  tempo_preparo_minutos: number;
   porcoes: number;
   id_categorias: string;
   categoria_nome: string;
@@ -54,7 +54,7 @@ export interface CreateRecipeData {
   nome: string;
   ingredientes: string;
   modo_preparo: string;
-  tempo_preparo: number;
+  tempo_preparo_minutos: number;
   porcoes: number;
   id_categorias: string;
 }

@@ -112,7 +112,7 @@
                 <div class="recipe-info">
                   <span class="text-caption text-medium-emphasis">
                     <v-icon icon="mdi-clock-outline" size="16" class="mr-1" />
-                    {{ recipe.tempo_preparo }} min
+                    {{ recipe.tempo_preparo_minutos }} min
                   </span>
                   <span class="text-caption text-medium-emphasis ml-3">
                     <v-icon icon="mdi-account-group" size="16" class="mr-1" />

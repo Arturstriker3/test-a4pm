@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
 import { TYPES } from "../../common/types";
 import { RecipesService } from "./recipes.service";
-import { CreateRecipeDto, CreateRecipeResponseDto, UpdateRecipeDto, UpdateRecipeResponseDto, RecipeDto, RecipeIdDto } from "./dto";
+import { CreateRecipeDto, CreateRecipeResponseDto, UpdateRecipeDto, UpdateRecipeResponseDto, RecipeDto } from "./dto";
 import { Controller, Post, Patch, Get, Delete, Body, Param, Query } from "../../common/decorators";
 import { ApiResponse, PaginatedData } from "../../common/responses";
 import { PaginationParamsDto } from "../../common/dto";
@@ -140,8 +140,8 @@ export class RecipesController {
 	@ApiNotFoundResponse({
 		messageExample: "Receita não encontrada",
 	})
-	async updateRecipe(@Param("id") recipeId: RecipeIdDto, @Body(UpdateRecipeDto) updateRecipeDto: UpdateRecipeDto, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<UpdateRecipeResponseDto>> {
-		const response = await this.recipesService.updateRecipe(recipeId.id, updateRecipeDto, user.userId, user.role as any);
+	async updateRecipe(@Param("id") recipeId: string, @Body(UpdateRecipeDto) updateRecipeDto: UpdateRecipeDto, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<UpdateRecipeResponseDto>> {
+		const response = await this.recipesService.updateRecipe(recipeId, updateRecipeDto, user.userId, user.role as any);
 		return ApiResponse.success(response, "Receita atualizada com sucesso");
 	}
 
@@ -163,8 +163,8 @@ export class RecipesController {
 	@ApiNotFoundResponse({
 		messageExample: "Receita não encontrada",
 	})
-	async deleteRecipe(@Param("id") recipeId: RecipeIdDto, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<null>> {
-		await this.recipesService.deleteRecipe(recipeId.id, user.userId, user.role as any);
+	async deleteRecipe(@Param("id") recipeId: string, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<null>> {
+		await this.recipesService.deleteRecipe(recipeId, user.userId, user.role as any);
 		return ApiResponse.success(null, "Receita deletada com sucesso");
 	}
 }

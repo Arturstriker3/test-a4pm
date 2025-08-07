@@ -64,7 +64,7 @@
 
                   <v-col cols="12" sm="6">
                     <v-text-field
-                      v-model.number="formData.tempo_preparo"
+                      v-model.number="formData.tempo_preparo_minutos"
                       label="Tempo de Preparo (minutos)"
                       placeholder="Ex: 45"
                       variant="outlined"
@@ -181,7 +181,7 @@ const formData = ref<UpdateRecipeData>({
   nome: '',
   ingredientes: '',
   modo_preparo: '',
-  tempo_preparo: 30,
+  tempo_preparo_minutos: 30,
   porcoes: 4,
   id_categorias: ''
 })
@@ -195,8 +195,8 @@ const isFormValid = computed(() => {
          formData.value.ingredientes?.trim() && 
          formData.value.modo_preparo?.trim() &&
          formData.value.id_categorias &&
-         formData.value.tempo_preparo &&
-         formData.value.tempo_preparo > 0 &&
+         formData.value.tempo_preparo_minutos &&
+         formData.value.tempo_preparo_minutos > 0 &&
          formData.value.porcoes &&
          formData.value.porcoes > 0
 })
@@ -245,7 +245,7 @@ const loadRecipe = async () => {
         nome: currentRecipe.value.nome,
         ingredientes: currentRecipe.value.ingredientes,
         modo_preparo: currentRecipe.value.modo_preparo,
-        tempo_preparo: currentRecipe.value.tempo_preparo,
+        tempo_preparo_minutos: currentRecipe.value.tempo_preparo_minutos,
         porcoes: currentRecipe.value.porcoes,
         id_categorias: currentRecipe.value.id_categorias
       }

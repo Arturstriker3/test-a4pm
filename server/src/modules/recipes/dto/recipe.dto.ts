@@ -33,7 +33,7 @@ export class RecipeDto {
 		description: "Tempo de preparo em minutos",
 		example: 45,
 	})
-	tempo_preparo!: number;
+	tempo_preparo_minutos!: number;
 
 	@SchemaProperty({
 		description: "Número de porções que a receita rende",
@@ -86,7 +86,7 @@ export class RecipeDto {
 		nome: string;
 		ingredientes: string;
 		modo_preparo: string;
-		tempo_preparo: number;
+		tempo_preparo_minutos: number;
 		porcoes: number;
 		id_categorias: string;
 		categoria_nome: string;
