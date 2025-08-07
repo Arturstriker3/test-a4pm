@@ -6,21 +6,21 @@ import { NotFoundException, ForbiddenException } from "../../../common/exception
 
 @injectable()
 export class DeleteRecipeUseCase {
-  constructor(
-    @inject(TYPES.RecipesRepository)
-    private readonly recipesRepository: RecipesRepository
-  ) {}
+	constructor(
+		@inject(TYPES.RecipesRepository)
+		private readonly recipesRepository: RecipesRepository
+	) {}
 
-  async execute(recipeId: string, userId: string, userRole: UserRole): Promise<void> {
-    const existingRecipe = await this.recipesRepository.findById(recipeId);
-    if (!existingRecipe) {
-      throw new NotFoundException("Receita não encontrada");
-    }
+	async execute(recipeId: string, userId: string, userRole: UserRole): Promise<void> {
+		const existingRecipe = await this.recipesRepository.findById(recipeId);
+		if (!existingRecipe) {
+			throw new NotFoundException("Receita não encontrada");
+		}
 
-    if (userRole !== UserRole.ADMIN && existingRecipe.id_usuarios !== userId) {
-      throw new ForbiddenException("Você só pode deletar suas próprias receitas");
-    }
+		if (userRole !== UserRole.ADMIN && existingRecipe.id_usuarios !== userId) {
+			throw new ForbiddenException("Você só pode deletar suas próprias receitas");
+		}
 
-    await this.recipesRepository.delete(recipeId);
-  }
+		await this.recipesRepository.delete(recipeId);
+	}
 }

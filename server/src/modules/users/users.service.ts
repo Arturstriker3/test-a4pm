@@ -8,41 +8,37 @@ import { UserBusinessRules } from "./rules/user.rules";
 
 @injectable()
 export class UsersService {
-  constructor(
-    @inject(TYPES.UsersRepository)
-    private readonly usersRepository: UsersRepository,
-    @inject(TYPES.GetUserByIdUseCase)
-    private readonly getUserByIdUseCase: GetUserByIdUseCase
-  ) {}
+	constructor(
+		@inject(TYPES.UsersRepository)
+		private readonly usersRepository: UsersRepository,
+		@inject(TYPES.GetUserByIdUseCase)
+		private readonly getUserByIdUseCase: GetUserByIdUseCase
+	) {}
 
-  async getUserById(userId: string): Promise<UserProfileDto> {
-    return await this.getUserByIdUseCase.execute(userId);
-  }
+	async getUserById(userId: string): Promise<UserProfileDto> {
+		return await this.getUserByIdUseCase.execute(userId);
+	}
 
-  async findAllPaginated(
-    page: number,
-    limit: number,
-    offset: number
-  ): Promise<{ items: UserProfileDto[]; total: number }> {
-    // Busca os usuários com paginação
-    const users = await this.usersRepository.findWithPagination(offset, limit);
+	async findAllPaginated(page: number, limit: number, offset: number): Promise<{ items: UserProfileDto[]; total: number }> {
+		// Busca os usuários com paginação
+		const users = await this.usersRepository.findWithPagination(offset, limit);
 
-    // Busca o total de usuários para cálculo da paginação
-    const total = await this.usersRepository.count();
+		// Busca o total de usuários para cálculo da paginação
+		const total = await this.usersRepository.count();
 
-    // Converte para DTO (note que o email é o login no banco)
-    const items = users.map(
-      (user) =>
-        new UserProfileDto({
-          id: user.id,
-          nome: user.nome,
-          email: user.login, // No banco o campo email é "login"
-          role: user.nivel_acesso, // Mapeia nivel_acesso para role
-          criado_em: user.criado_em,
-          alterado_em: user.alterado_em,
-        })
-    );
+		// Converte para DTO (note que o email é o login no banco)
+		const items = users.map(
+			(user) =>
+				new UserProfileDto({
+					id: user.id,
+					nome: user.nome,
+					email: user.login, // No banco o campo email é "login"
+					role: user.nivel_acesso, // Mapeia nivel_acesso para role
+					criado_em: user.criado_em,
+					alterado_em: user.alterado_em,
+				})
+		);
 
-    return { items, total };
-  }
+		return { items, total };
+	}
 }

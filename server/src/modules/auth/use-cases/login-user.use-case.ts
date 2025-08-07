@@ -18,45 +18,45 @@ import * as bcrypt from "bcrypt";
  */
 @injectable()
 export class LoginUserUseCase {
-  constructor(
-    @inject(TYPES.UsersRepository)
-    private readonly usersRepository: UsersRepository
-  ) {}
+	constructor(
+		@inject(TYPES.UsersRepository)
+		private readonly usersRepository: UsersRepository
+	) {}
 
-  async execute(request: LoginDto): Promise<LoginResponseDto> {
-    const user = await this.usersRepository.findByLogin(request.login);
+	async execute(request: LoginDto): Promise<LoginResponseDto> {
+		const user = await this.usersRepository.findByLogin(request.login);
 
-    UserBusinessRules.validateUserForLogin(user);
+		UserBusinessRules.validateUserForLogin(user);
 
-    const validUser = user!;
+		const validUser = user!;
 
-    const isPasswordValid = await this.verifyPassword(request.senha, validUser.senha);
+		const isPasswordValid = await this.verifyPassword(request.senha, validUser.senha);
 
-    UserBusinessRules.validatePasswordMatch(isPasswordValid);
+		UserBusinessRules.validatePasswordMatch(isPasswordValid);
 
-    const token = AuthMiddleware.generateToken({
-      userId: validUser.id,
-      email: validUser.login,
-      role: validUser.nivel_acesso,
-    });
+		const token = AuthMiddleware.generateToken({
+			userId: validUser.id,
+			email: validUser.login,
+			role: validUser.nivel_acesso,
+		});
 
-    const recoveryToken = AuthMiddleware.generateRecoveryToken({
-      userId: validUser.id,
-      email: validUser.login,
-    });
+		const recoveryToken = AuthMiddleware.generateRecoveryToken({
+			userId: validUser.id,
+			email: validUser.login,
+		});
 
-    await this.usersRepository.updateRecoveryToken(validUser.id, recoveryToken);
+		await this.usersRepository.updateRecoveryToken(validUser.id, recoveryToken);
 
-    return new LoginResponseDto({
-      token,
-      userId: validUser.id,
-      nome: validUser.nome,
-      email: validUser.login,
-      role: validUser.nivel_acesso,
-    });
-  }
+		return new LoginResponseDto({
+			token,
+			userId: validUser.id,
+			nome: validUser.nome,
+			email: validUser.login,
+			role: validUser.nivel_acesso,
+		});
+	}
 
-  private async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
-    return bcrypt.compare(plainPassword, hashedPassword);
-  }
+	private async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+		return bcrypt.compare(plainPassword, hashedPassword);
+	}
 }

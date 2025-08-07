@@ -14,24 +14,24 @@ import { UserProfileDto } from "../dto/user-profile.dto";
  */
 @injectable()
 export class GetUserByIdUseCase {
-  constructor(
-    @inject(TYPES.UsersRepository)
-    private readonly usersRepository: UsersRepository
-  ) {}
+	constructor(
+		@inject(TYPES.UsersRepository)
+		private readonly usersRepository: UsersRepository
+	) {}
 
-  async execute(userId: string): Promise<UserProfileDto> {
-    const user = await this.usersRepository.findById(userId);
-    UserBusinessRules.validateUserForGetUserData(user);
+	async execute(userId: string): Promise<UserProfileDto> {
+		const user = await this.usersRepository.findById(userId);
+		UserBusinessRules.validateUserForGetUserData(user);
 
-    const validUser = user!;
+		const validUser = user!;
 
-    return new UserProfileDto({
-      id: validUser.id,
-      nome: validUser.nome,
-      email: validUser.login,
-      role: validUser.nivel_acesso,
-      criado_em: validUser.criado_em,
-      alterado_em: validUser.alterado_em,
-    });
-  }
+		return new UserProfileDto({
+			id: validUser.id,
+			nome: validUser.nome,
+			email: validUser.login,
+			role: validUser.nivel_acesso,
+			criado_em: validUser.criado_em,
+			alterado_em: validUser.alterado_em,
+		});
+	}
 }

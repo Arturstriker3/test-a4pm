@@ -3,11 +3,11 @@ import { connectDatabase } from "./app/database.service";
 import { createFastifyApp, startServer } from "./app/fastify.service";
 
 async function bootstrap() {
-  await connectDatabase();
+	await connectDatabase();
 
-  const app = await createFastifyApp();
+	const app = await createFastifyApp();
 
-  await startServer(app);
+	await startServer(app);
 }
 
 bootstrap().catch(console.error);

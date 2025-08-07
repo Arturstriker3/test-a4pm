@@ -139,8 +139,8 @@ export class RecipesController {
 	@ApiNotFoundResponse({
 		messageExample: "Receita não encontrada",
 	})
-	async deleteRecipe(@Param("id") recipeId: string, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<null>> {
-		await this.recipesService.deleteRecipe(recipeId, user.userId, user.role as any);
+	async deleteRecipe(@Param("id") recipeId: RecipeIdDto, @CurrentUserFull() user: JwtPayload): Promise<ApiResponse<null>> {
+		await this.recipesService.deleteRecipe(recipeId.id, user.userId, user.role as any);
 		return ApiResponse.success(null, "Receita deletada com sucesso");
 	}
 }

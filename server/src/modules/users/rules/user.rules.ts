@@ -8,52 +8,52 @@ import { ConflictException, UnauthorizedException } from "../../../common/except
  */
 
 export class UserBusinessRules {
-  /**
-   * Regra de Negócio: Email deve ser único no sistema
-   */
-  static validateUniqueEmail(existingUser: any): void {
-    if (existingUser) {
-      throw new ConflictException("Já existe um usuário cadastrado com este email");
-    }
-  }
+	/**
+	 * Regra de Negócio: Email deve ser único no sistema
+	 */
+	static validateUniqueEmail(existingUser: any): void {
+		if (existingUser) {
+			throw new ConflictException("Já existe um usuário cadastrado com este email");
+		}
+	}
 
-  /**
-   * Regra de Negócio: Usuário deve existir para realizar login
-   * Retorna mensagem genérica por segurança (não revela se usuário existe)
-   */
-  static validateUserForLogin(user: any): void {
-    if (!user) {
-      throw new UnauthorizedException("Email ou senha inválidos");
-    }
-  }
+	/**
+	 * Regra de Negócio: Usuário deve existir para realizar login
+	 * Retorna mensagem genérica por segurança (não revela se usuário existe)
+	 */
+	static validateUserForLogin(user: any): void {
+		if (!user) {
+			throw new UnauthorizedException("Email ou senha inválidos");
+		}
+	}
 
-  /**
-   * Regra de Negócio: Senha deve coincidir durante o login
-   * Retorna mensagem genérica por segurança (não revela que usuário existe)
-   */
-  static validatePasswordMatch(isPasswordValid: boolean): void {
-    if (!isPasswordValid) {
-      throw new UnauthorizedException("Email ou senha inválidos");
-    }
-  }
+	/**
+	 * Regra de Negócio: Senha deve coincidir durante o login
+	 * Retorna mensagem genérica por segurança (não revela que usuário existe)
+	 */
+	static validatePasswordMatch(isPasswordValid: boolean): void {
+		if (!isPasswordValid) {
+			throw new UnauthorizedException("Email ou senha inválidos");
+		}
+	}
 
-  /**
-   * Regra de Negócio: Usuário deve existir para refresh token
-   * Retorna mensagem específica pois token já foi validado previamente
-   */
-  static validateUserForRefresh(user: any): void {
-    if (!user) {
-      throw new UnauthorizedException("Usuário não encontrado ou inválido");
-    }
-  }
+	/**
+	 * Regra de Negócio: Usuário deve existir para refresh token
+	 * Retorna mensagem específica pois token já foi validado previamente
+	 */
+	static validateUserForRefresh(user: any): void {
+		if (!user) {
+			throw new UnauthorizedException("Usuário não encontrado ou inválido");
+		}
+	}
 
-  /**
-   * Regra de Negócio: Usuário deve existir para retornar seus dados
-   * Retorna mensagem específica pois token já foi validado previamente
-   */
-  static validateUserForGetUserData(user: any): void {
-    if (!user) {
-      throw new UnauthorizedException("Usuário não encontrado ou inválido");
-    }
-  }
+	/**
+	 * Regra de Negócio: Usuário deve existir para retornar seus dados
+	 * Retorna mensagem específica pois token já foi validado previamente
+	 */
+	static validateUserForGetUserData(user: any): void {
+		if (!user) {
+			throw new UnauthorizedException("Usuário não encontrado ou inválido");
+		}
+	}
 }

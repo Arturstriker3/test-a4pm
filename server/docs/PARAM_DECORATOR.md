@@ -53,16 +53,16 @@ import { IsUUID } from "class-validator";
 import { SchemaProperty, SchemaClass } from "../../../common/decorators";
 
 @SchemaClass({
-  description: "DTO para validação de parâmetro ID do usuário.",
+	description: "DTO para validação de parâmetro ID do usuário.",
 })
 export class LogoutParamDto {
-  @IsUUID(4, { message: "ID do usuário deve ser um UUID válido" })
-  @SchemaProperty({
-    description: "ID único do usuário",
-    format: "uuid",
-    example: "123e4567-e89b-12d3-a456-426614174000",
-  })
-  id!: string;
+	@IsUUID(4, { message: "ID do usuário deve ser um UUID válido" })
+	@SchemaProperty({
+		description: "ID único do usuário",
+		format: "uuid",
+		example: "123e4567-e89b-12d3-a456-426614174000",
+	})
+	id!: string;
 }
 ```
 
@@ -114,10 +114,10 @@ Se validação falhar, é lançada uma `ValidationException` automaticamente:
 
 ```json
 {
-  "success": false,
-  "code": 400,
-  "message": "ID do usuário deve ser um UUID válido",
-  "data": null
+	"success": false,
+	"code": 400,
+	"message": "ID do usuário deve ser um UUID válido",
+	"data": null
 }
 ```
 
@@ -146,9 +146,9 @@ src/
 
 ```typescript
 interface ParamMetadata {
-  index: number; // Posição do parâmetro no método
-  paramName: string; // Nome do parâmetro na URL (:id)
-  dtoClass?: new () => any; // Classe DTO para validação
+	index: number; // Posição do parâmetro no método
+	paramName: string; // Nome do parâmetro na URL (:id)
+	dtoClass?: new () => any; // Classe DTO para validação
 }
 ```
 
@@ -179,32 +179,27 @@ async findById(@Param("id", UserIdDto) id: string): Promise<ApiResponse<User>> {
 ```typescript
 @Controller("/users")
 export class UsersController {
-  @Get("/:id")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  async findById(
-    @Param("id", UserIdDto) id: string
-  ): Promise<ApiResponse<User>> {
-    const user = await this.usersService.findById(id);
-    return ApiResponse.success(user, "Usuário encontrado");
-  }
+	@Get("/:id")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	async findById(@Param("id", UserIdDto) id: string): Promise<ApiResponse<User>> {
+		const user = await this.usersService.findById(id);
+		return ApiResponse.success(user, "Usuário encontrado");
+	}
 
-  @Put("/:id")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  async update(
-    @Param("id", UserIdDto) id: string,
-    updateDto: UpdateUserDto
-  ): Promise<ApiResponse<User>> {
-    const user = await this.usersService.update(id, updateDto);
-    return ApiResponse.success(user, "Usuário atualizado");
-  }
+	@Put("/:id")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	async update(@Param("id", UserIdDto) id: string, updateDto: UpdateUserDto): Promise<ApiResponse<User>> {
+		const user = await this.usersService.update(id, updateDto);
+		return ApiResponse.success(user, "Usuário atualizado");
+	}
 
-  @Delete("/:id")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  @AccessTo(UserRole.ADMIN)
-  async delete(@Param("id", UserIdDto) id: string): Promise<ApiResponse<void>> {
-    await this.usersService.delete(id);
-    return ApiResponse.success(undefined, "Usuário excluído");
-  }
+	@Delete("/:id")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	@AccessTo(UserRole.ADMIN)
+	async delete(@Param("id", UserIdDto) id: string): Promise<ApiResponse<void>> {
+		await this.usersService.delete(id);
+		return ApiResponse.success(undefined, "Usuário excluído");
+	}
 }
 ```
 
@@ -213,24 +208,19 @@ export class UsersController {
 ```typescript
 @Controller("/recipes")
 export class RecipesController {
-  @Get("/:id")
-  @RouteAccess(RouteAccessType.PUBLIC)
-  async findById(
-    @Param("id", RecipeIdDto) id: string
-  ): Promise<ApiResponse<Recipe>> {
-    const recipe = await this.recipesService.findById(id);
-    return ApiResponse.success(recipe, "Receita encontrada");
-  }
+	@Get("/:id")
+	@RouteAccess(RouteAccessType.PUBLIC)
+	async findById(@Param("id", RecipeIdDto) id: string): Promise<ApiResponse<Recipe>> {
+		const recipe = await this.recipesService.findById(id);
+		return ApiResponse.success(recipe, "Receita encontrada");
+	}
 
-  @Put("/:id")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  async update(
-    @Param("id", RecipeIdDto) id: string,
-    updateDto: UpdateRecipeDto
-  ): Promise<ApiResponse<Recipe>> {
-    const recipe = await this.recipesService.update(id, updateDto);
-    return ApiResponse.success(recipe, "Receita atualizada");
-  }
+	@Put("/:id")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	async update(@Param("id", RecipeIdDto) id: string, updateDto: UpdateRecipeDto): Promise<ApiResponse<Recipe>> {
+		const recipe = await this.recipesService.update(id, updateDto);
+		return ApiResponse.success(recipe, "Receita atualizada");
+	}
 }
 ```
 
@@ -239,15 +229,12 @@ export class RecipesController {
 ```typescript
 @Controller("/users")
 export class UsersController {
-  @Get("/:userId/recipes/:recipeId")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  async getUserRecipe(
-    @Param("userId", UserIdDto) userId: string,
-    @Param("recipeId", RecipeIdDto) recipeId: string
-  ): Promise<ApiResponse<Recipe>> {
-    const recipe = await this.recipesService.findByUserAndId(userId, recipeId);
-    return ApiResponse.success(recipe, "Receita do usuário encontrada");
-  }
+	@Get("/:userId/recipes/:recipeId")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	async getUserRecipe(@Param("userId", UserIdDto) userId: string, @Param("recipeId", RecipeIdDto) recipeId: string): Promise<ApiResponse<Recipe>> {
+		const recipe = await this.recipesService.findByUserAndId(userId, recipeId);
+		return ApiResponse.success(recipe, "Receita do usuário encontrada");
+	}
 }
 ```
 
@@ -272,14 +259,14 @@ RecipeIdDto        // Para IDs de receita
 ```typescript
 // ✅ DTOs específicos para diferentes contextos
 export class UserIdDto {
-  @IsUUID(4, { message: "ID do usuário deve ser um UUID válido" })
-  id!: string;
+	@IsUUID(4, { message: "ID do usuário deve ser um UUID válido" })
+	id!: string;
 }
 
 export class RecipeIdDto {
-  @IsUUID(4, { message: "ID da receita deve ser um UUID válido" })
-  @IsNotEmpty({ message: "ID da receita é obrigatório" })
-  id!: string;
+	@IsUUID(4, { message: "ID da receita deve ser um UUID válido" })
+	@IsNotEmpty({ message: "ID da receita é obrigatório" })
+	id!: string;
 }
 ```
 

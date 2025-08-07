@@ -109,24 +109,24 @@ async create(userDto: CreateUserDto): Promise<ApiResponse<User>> {
 ```typescript
 @Controller("/users")
 export class UsersController {
-  @Get("/")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  @AccessTo(UserRole.ADMIN)
-  async findAll() {
-    // GET /api/users/ - Apenas ADMINs
-  }
+	@Get("/")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	@AccessTo(UserRole.ADMIN)
+	async findAll() {
+		// GET /api/users/ - Apenas ADMINs
+	}
 
-  @Get("/:id")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  async findById(params: { id: string }) {
-    // GET /api/users/:id - Usuários autenticados
-  }
+	@Get("/:id")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	async findById(params: { id: string }) {
+		// GET /api/users/:id - Usuários autenticados
+	}
 
-  @Put("/:id")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  async update(params: { id: string }, userDto: UpdateUserDto) {
-    // PUT /api/users/:id - Usuários autenticados
-  }
+	@Put("/:id")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	async update(params: { id: string }, userDto: UpdateUserDto) {
+		// PUT /api/users/:id - Usuários autenticados
+	}
 }
 ```
 
@@ -135,18 +135,18 @@ export class UsersController {
 ```typescript
 @Controller("/categories")
 export class CategoriesController {
-  @Get("/")
-  @RouteAccess(RouteAccessType.PUBLIC)
-  async findAll() {
-    // GET /api/categories/ - Público
-  }
+	@Get("/")
+	@RouteAccess(RouteAccessType.PUBLIC)
+	async findAll() {
+		// GET /api/categories/ - Público
+	}
 
-  @Post("/")
-  @RouteAccess(RouteAccessType.AUTHENTICATED)
-  @AccessTo(UserRole.ADMIN)
-  async create(categoryDto: CreateCategoryDto) {
-    // POST /api/categories/ - Apenas ADMINs
-  }
+	@Post("/")
+	@RouteAccess(RouteAccessType.AUTHENTICATED)
+	@AccessTo(UserRole.ADMIN)
+	async create(categoryDto: CreateCategoryDto) {
+		// POST /api/categories/ - Apenas ADMINs
+	}
 }
 ```
 

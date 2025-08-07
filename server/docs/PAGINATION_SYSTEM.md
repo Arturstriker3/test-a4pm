@@ -10,15 +10,15 @@ Sistema de paginação com generics que pode ser usado em **todos os módulos** 
 
 ```typescript
 interface PaginatedData<T> {
-  items: T[]; // Array de itens da página atual
-  pagination: {
-    currentPage: number; // Página atual (baseada em 1)
-    itemsPerPage: number; // Itens por página
-    totalItems: number; // Total de itens encontrados
-    totalPages: number; // Total de páginas
-    hasNextPage: boolean; // Tem próxima página?
-    hasPreviousPage: boolean; // Tem página anterior?
-  };
+	items: T[]; // Array de itens da página atual
+	pagination: {
+		currentPage: number; // Página atual (baseada em 1)
+		itemsPerPage: number; // Itens por página
+		totalItems: number; // Total de itens encontrados
+		totalPages: number; // Total de páginas
+		hasNextPage: boolean; // Tem próxima página?
+		hasPreviousPage: boolean; // Tem página anterior?
+	};
 }
 ```
 
@@ -26,9 +26,9 @@ interface PaginatedData<T> {
 
 ```typescript
 class PaginationParamsDto {
-  page?: number = 1; // Página (min: 1)
-  limit?: number = 10; // Limite (min: 1, max: 100)
-  get offset(): number; // Calcula offset automaticamente
+	page?: number = 1; // Página (min: 1)
+	limit?: number = 10; // Limite (min: 1, max: 100)
+	get offset(): number; // Calcula offset automaticamente
 }
 ```
 
@@ -89,27 +89,27 @@ Authorization: Bearer <seu-token>
 
 ```json
 {
-  "message": "Lista de usuários retornada com sucesso",
-  "data": {
-    "items": [
-      {
-        "id": "uuid-do-usuario",
-        "nome": "João Silva",
-        "email": "joao@email.com",
-        "role": "DEFAULT",
-        "criado_em": "2024-01-15T10:30:00.000Z",
-        "alterado_em": "2024-01-15T10:30:00.000Z"
-      }
-    ],
-    "pagination": {
-      "currentPage": 2,
-      "itemsPerPage": 5,
-      "totalItems": 25,
-      "totalPages": 5,
-      "hasNextPage": true,
-      "hasPreviousPage": true
-    }
-  }
+	"message": "Lista de usuários retornada com sucesso",
+	"data": {
+		"items": [
+			{
+				"id": "uuid-do-usuario",
+				"nome": "João Silva",
+				"email": "joao@email.com",
+				"role": "DEFAULT",
+				"criado_em": "2024-01-15T10:30:00.000Z",
+				"alterado_em": "2024-01-15T10:30:00.000Z"
+			}
+		],
+		"pagination": {
+			"currentPage": 2,
+			"itemsPerPage": 5,
+			"totalItems": 25,
+			"totalPages": 5,
+			"hasNextPage": true,
+			"hasPreviousPage": true
+		}
+	}
 }
 ```
 

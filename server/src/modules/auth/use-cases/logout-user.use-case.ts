@@ -9,13 +9,13 @@ import { UserIdDto } from "@/modules/users/dto/id.dto";
  */
 @injectable()
 export class LogoutUserUseCase {
-  constructor(
-    @inject(TYPES.UsersRepository)
-    private readonly usersRepository: UsersRepository
-  ) {}
+	constructor(
+		@inject(TYPES.UsersRepository)
+		private readonly usersRepository: UsersRepository
+	) {}
 
-  async execute(request: UserIdDto): Promise<boolean> {
-    await this.usersRepository.updateRecoveryToken(request.id, null);
-    return true;
-  }
+	async execute(request: UserIdDto): Promise<boolean> {
+		await this.usersRepository.updateRecoveryToken(request.id, null);
+		return true;
+	}
 }

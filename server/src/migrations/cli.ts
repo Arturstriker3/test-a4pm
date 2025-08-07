@@ -3,61 +3,61 @@
 import { MigrationRunner } from "./MigrationRunner";
 
 async function runMigrationCommand() {
-  const args = process.argv.slice(2);
-  const command = args[0];
+	const args = process.argv.slice(2);
+	const command = args[0];
 
-  const runner = new MigrationRunner();
+	const runner = new MigrationRunner();
 
-  try {
-    await runner.connect();
+	try {
+		await runner.connect();
 
-    switch (command) {
-      case "run":
-      case "migrate":
-        await runner.runPendingMigrations();
-        break;
+		switch (command) {
+			case "run":
+			case "migrate":
+				await runner.runPendingMigrations();
+				break;
 
-      case "rollback":
-        await runner.rollbackLastMigration();
-        break;
+			case "rollback":
+				await runner.rollbackLastMigration();
+				break;
 
-      case "status":
-        await runner.getStatus();
-        break;
+			case "status":
+				await runner.getStatus();
+				break;
 
-      case "create":
-        const migrationName = args[1];
-        if (!migrationName) {
-          console.error("❌ Migration name is required");
-          console.log("Usage: tsx src/migrations/cli.ts create <migration-name>");
-          process.exit(1);
-        }
-        await createMigrationFile(migrationName);
-        break;
+			case "create":
+				const migrationName = args[1];
+				if (!migrationName) {
+					console.error("❌ Migration name is required");
+					console.log("Usage: tsx src/migrations/cli.ts create <migration-name>");
+					process.exit(1);
+				}
+				await createMigrationFile(migrationName);
+				break;
 
-      default:
-        console.log("📚 Available commands:");
-        console.log("  run|migrate  - Run all pending migrations");
-        console.log("  rollback     - Rollback the last migration");
-        console.log("  status       - Show migration status");
-        console.log("  create <name> - Create a new migration file");
-        console.log("\nUsage: tsx src/migrations/cli.ts <command>");
-        break;
-    }
-  } catch (error) {
-    console.error("❌ Migration command failed:", error);
-    process.exit(1);
-  } finally {
-    await runner.disconnect();
-  }
+			default:
+				console.log("📚 Available commands:");
+				console.log("  run|migrate  - Run all pending migrations");
+				console.log("  rollback     - Rollback the last migration");
+				console.log("  status       - Show migration status");
+				console.log("  create <name> - Create a new migration file");
+				console.log("\nUsage: tsx src/migrations/cli.ts <command>");
+				break;
+		}
+	} catch (error) {
+		console.error("❌ Migration command failed:", error);
+		process.exit(1);
+	} finally {
+		await runner.disconnect();
+	}
 }
 
 async function createMigrationFile(name: string): Promise<void> {
-  const timestamp = Date.now();
-  const fileName = `${timestamp}_${name.replace(/[^a-zA-Z0-9]/g, "_")}.migration.ts`;
-  const filePath = `${__dirname}/files/${fileName}`;
+	const timestamp = Date.now();
+	const fileName = `${timestamp}_${name.replace(/[^a-zA-Z0-9]/g, "_")}.migration.ts`;
+	const filePath = `${__dirname}/files/${fileName}`;
 
-  const template = `import { Connection } from "mysql2/promise";
+	const template = `import { Connection } from "mysql2/promise";
 import { Migration } from "../Migration.interface";
 
 const migration: Migration = {
@@ -86,12 +86,12 @@ const migration: Migration = {
 export default migration;
 `;
 
-  const fs = require("fs");
-  fs.writeFileSync(filePath, template);
+	const fs = require("fs");
+	fs.writeFileSync(filePath, template);
 
-  console.log(`✅ Migration created: ${fileName}`);
-  console.log(`📁 Path: ${filePath}`);
-  console.log("📝 Please edit the file to implement your migration logic");
+	console.log(`✅ Migration created: ${fileName}`);
+	console.log(`📁 Path: ${filePath}`);
+	console.log("📝 Please edit the file to implement your migration logic");
 }
 
 runMigrationCommand();

@@ -25,63 +25,63 @@ import { User } from "../../users/entities/user.entity";
  */
 @injectable()
 export class RefreshUserUseCase {
-  constructor(
-    @inject(TYPES.UsersRepository)
-    private readonly usersRepository: UsersRepository
-  ) {}
+	constructor(
+		@inject(TYPES.UsersRepository)
+		private readonly usersRepository: UsersRepository
+	) {}
 
-  async execute(request: RefreshTokenDto): Promise<TokenResponseDto> {
-    const payload = this.verifyRefreshToken(request.refreshToken);
-    const user = await this.getUserByPayload(payload);
+	async execute(request: RefreshTokenDto): Promise<TokenResponseDto> {
+		const payload = this.verifyRefreshToken(request.refreshToken);
+		const user = await this.getUserByPayload(payload);
 
-    UserBusinessRules.validateUserForRefresh(user);
+		UserBusinessRules.validateUserForRefresh(user);
 
-    await this.validateStoredRefreshToken(user, request.refreshToken);
+		await this.validateStoredRefreshToken(user, request.refreshToken);
 
-    const { token, refreshToken } = await this.generateTokens(user);
-    return new TokenResponseDto({ token, refreshToken });
-  }
+		const { token, refreshToken } = await this.generateTokens(user);
+		return new TokenResponseDto({ token, refreshToken });
+	}
 
-  private verifyRefreshToken(token: string): JwtPayload {
-    const payload = AuthMiddleware.verifyToken(token);
-    if (!payload || !payload.userId) {
-      throw new UnauthorizedException("Refresh token inválido ou não corresponde ao token armazenado");
-    }
-    return payload;
-  }
+	private verifyRefreshToken(token: string): JwtPayload {
+		const payload = AuthMiddleware.verifyToken(token);
+		if (!payload || !payload.userId) {
+			throw new UnauthorizedException("Refresh token inválido ou não corresponde ao token armazenado");
+		}
+		return payload;
+	}
 
-  private async getUserByPayload(payload: JwtPayload): Promise<User> {
-    const user = await this.usersRepository.findById(payload.userId);
-    if (!user) {
-      throw new NotFoundException("Usuário não encontrado ou inválido");
-    }
-    return user;
-  }
+	private async getUserByPayload(payload: JwtPayload): Promise<User> {
+		const user = await this.usersRepository.findById(payload.userId);
+		if (!user) {
+			throw new NotFoundException("Usuário não encontrado ou inválido");
+		}
+		return user;
+	}
 
-  private async validateStoredRefreshToken(user: User, providedRefreshToken: string): Promise<void> {
-    if (!user.recovery_token) {
-      throw new UnauthorizedException("Refresh token inválido ou não corresponde ao token armazenado");
-    }
+	private async validateStoredRefreshToken(user: User, providedRefreshToken: string): Promise<void> {
+		if (!user.recovery_token) {
+			throw new UnauthorizedException("Refresh token inválido ou não corresponde ao token armazenado");
+		}
 
-    if (user.recovery_token !== providedRefreshToken) {
-      throw new UnauthorizedException("Refresh token inválido ou não corresponde ao token armazenado");
-    }
-  }
+		if (user.recovery_token !== providedRefreshToken) {
+			throw new UnauthorizedException("Refresh token inválido ou não corresponde ao token armazenado");
+		}
+	}
 
-  private async generateTokens(user: User): Promise<{ token: string; refreshToken: string }> {
-    const token = AuthMiddleware.generateToken({
-      userId: user.id,
-      email: user.login,
-      role: user.nivel_acesso,
-    });
+	private async generateTokens(user: User): Promise<{ token: string; refreshToken: string }> {
+		const token = AuthMiddleware.generateToken({
+			userId: user.id,
+			email: user.login,
+			role: user.nivel_acesso,
+		});
 
-    const refreshToken = AuthMiddleware.generateRecoveryToken({
-      userId: user.id,
-      email: user.login,
-    });
+		const refreshToken = AuthMiddleware.generateRecoveryToken({
+			userId: user.id,
+			email: user.login,
+		});
 
-    await this.usersRepository.updateRecoveryToken(user.id, refreshToken);
+		await this.usersRepository.updateRecoveryToken(user.id, refreshToken);
 
-    return { token, refreshToken };
-  }
+		return { token, refreshToken };
+	}
 }

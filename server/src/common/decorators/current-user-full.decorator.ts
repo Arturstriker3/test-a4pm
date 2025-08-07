@@ -4,7 +4,7 @@ import "reflect-metadata";
 export const CURRENT_USER_FULL_METADATA_KEY = Symbol("current_user_full_metadata");
 
 export interface CurrentUserFullMetadata {
-  index: number;
+	index: number;
 }
 
 /**
@@ -14,23 +14,22 @@ export interface CurrentUserFullMetadata {
  * que foi validado pelo middleware de autenticação
  */
 export function CurrentUserFull() {
-  return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
-    const existingMetadata: CurrentUserFullMetadata[] =
-      Reflect.getMetadata(CURRENT_USER_FULL_METADATA_KEY, target, propertyKey) || [];
+	return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
+		const existingMetadata: CurrentUserFullMetadata[] = Reflect.getMetadata(CURRENT_USER_FULL_METADATA_KEY, target, propertyKey) || [];
 
-    const metadata: CurrentUserFullMetadata = {
-      index: parameterIndex,
-    };
+		const metadata: CurrentUserFullMetadata = {
+			index: parameterIndex,
+		};
 
-    existingMetadata.push(metadata);
+		existingMetadata.push(metadata);
 
-    Reflect.defineMetadata(CURRENT_USER_FULL_METADATA_KEY, existingMetadata, target, propertyKey);
-  };
+		Reflect.defineMetadata(CURRENT_USER_FULL_METADATA_KEY, existingMetadata, target, propertyKey);
+	};
 }
 
 /**
  * Função helper para extrair metadados de @CurrentUserFull
  */
 export function getCurrentUserFullMetadata(target: any, methodName: string): CurrentUserFullMetadata[] {
-  return Reflect.getMetadata(CURRENT_USER_FULL_METADATA_KEY, target, methodName) || [];
+	return Reflect.getMetadata(CURRENT_USER_FULL_METADATA_KEY, target, methodName) || [];
 }
