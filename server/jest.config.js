@@ -9,8 +9,8 @@ module.exports = {
 	collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts", "!src/main.ts", "!src/migrations/**"],
 	coverageDirectory: "coverage",
 	coverageReporters: ["text", "lcov", "html"],
-	setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup.ts"],
-	moduleNameMapping: {
+	// setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup.ts"],
+	moduleNameMapper: {
 		"^@/(.*)$": "<rootDir>/src/$1",
 	},
 	testTimeout: 10000,
