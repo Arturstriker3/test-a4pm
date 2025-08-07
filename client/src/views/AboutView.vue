@@ -5,7 +5,7 @@
         <v-col cols="12" lg="8">
           <div class="text-center mb-8">
             <v-icon icon="mdi-chef-hat" size="96" color="primary" class="mb-4" />
-            <h1 class="text-h3 font-weight-bold mb-4">Sobre o ChefBook</h1>
+            <h1 class="text-h3 font-weight-bold mb-4">Sobre o ChefiBook</h1>
             <p class="text-h6 text-medium-emphasis">
               Sua plataforma completa para organizar receitas culinárias
             </p>
@@ -16,7 +16,7 @@
               <div class="about-content">
                 <h2 class="text-h4 font-weight-bold mb-4">Nossa Missão</h2>
                 <p class="text-body-1 mb-6">
-                  O ChefBook foi criado para simplificar a vida de quem ama cozinhar. 
+                  O ChefiBook foi criado para simplificar a vida de quem ama cozinhar. 
                   Nossa missão é fornecer uma plataforma intuitiva e moderna onde você 
                   pode organizar, compartilhar e preservar suas receitas favoritas.
                 </p>

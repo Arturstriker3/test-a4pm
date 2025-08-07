@@ -8,13 +8,13 @@
               Olá, {{ user?.nome }}!
             </h1>
             <p class="text-h6 text-medium-emphasis">
-              Bem-vindo de volta ao seu ChefBook
+              Bem-vindo de volta ao seu ChefiBook
             </p>
           </div>
         </v-col>
       </v-row>
 
-      <v-row class="mb-8">
+      <v-row class="mb-8" v-show="!$vuetify.display.mobile">
         <v-col cols="12" sm="6" md="3" v-for="stat in stats" :key="stat.title">
           <v-card class="stat-card" elevation="2">
             <v-card-text class="text-center pa-6">
@@ -251,6 +251,33 @@ onMounted(() => {
 
   .recipe-description {
     line-height: 1.5;
+  }
+
+  /* Mobile specific styles */
+  @media (max-width: 599px) {
+    .welcome-header {
+      padding: $spacing-lg 0;
+      
+      .text-h3 {
+        font-size: 1.75rem !important;
+      }
+      
+      .text-h6 {
+        font-size: 1.125rem !important;
+      }
+    }
+
+    .quick-actions {
+      .v-btn {
+        width: 100%;
+        margin-bottom: $spacing-sm !important;
+        margin-right: 0 !important;
+      }
+    }
+
+    .text-h4 {
+      font-size: 1.5rem !important;
+    }
   }
 }
 </style>

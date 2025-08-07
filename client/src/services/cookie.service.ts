@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 
-const COOKIE_NAME = "chefbook_auth_token";
-const REFRESH_COOKIE_NAME = "chefbook_refresh_token";
+const COOKIE_NAME = "chefibook_auth_token";
+const REFRESH_COOKIE_NAME = "chefibook_refresh_token";
 
 const AUTH_TOKEN_EXPIRES = Number(import.meta.env.VITE_AUTH_TOKEN_EXPIRES) || 1;
 const REFRESH_TOKEN_EXPIRES =
@@ -13,7 +13,7 @@ const COOKIE_OPTIONS = {
   expires: AUTH_TOKEN_EXPIRES,
   path: "/",
 };
-
+    
 const REFRESH_COOKIE_OPTIONS = {
   secure: true,
   sameSite: "strict" as const,

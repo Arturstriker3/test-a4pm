@@ -6,10 +6,17 @@
       color="primary" 
       dark 
       :elevation="2"
+      sticky
     >
-      <v-app-bar-title>
-        <v-icon icon="mdi-chef-hat" class="mr-2" />
-        Sistema de Receitas
+      <!-- Menu Button (Mobile and Desktop) -->
+      <v-app-bar-nav-icon
+        v-if="isAuthenticated"
+        @click="toggleSidebar"
+      />
+
+      <v-app-bar-title class="cursor-pointer">
+        <v-icon icon="mdi-chef-hat" :class="$vuetify.display.mobile ? '' : 'mr-2'" />
+        <span v-if="!$vuetify.display.mobile">Chefibook</span>
       </v-app-bar-title>
 
       <v-spacer />
@@ -20,10 +27,15 @@
           <template v-slot:activator="{ props }">
             <v-btn
               v-bind="props"
-              :prepend-icon="user?.nivel_acesso === 'ADMIN' ? 'mdi-crown' : 'mdi-account'"
               variant="text"
             >
-              {{ user?.nome }}
+              <template v-if="$vuetify.display.mobile">
+                <v-icon :icon="user?.nivel_acesso === 'ADMIN' ? 'mdi-crown' : 'mdi-account'" />
+              </template>
+              <template v-else>
+                <v-icon :icon="user?.nivel_acesso === 'ADMIN' ? 'mdi-crown' : 'mdi-account'" class="mr-2" />
+                {{ user?.nome }}
+              </template>
             </v-btn>
           </template>
           <v-list>
@@ -55,23 +67,25 @@
       </template>
     </v-app-bar>
 
-    <!-- Navigation Drawer -->
+    <!-- Navigation Drawer - Desktop Only -->
     <v-navigation-drawer
-      v-if="isAuthenticated"
+      v-if="isAuthenticated && !isMobile"
+      v-model="sidebarOpen"
       app
-      :rail="rail"
-      @click="rail = false"
+      :rail="railMode"
+      disable-resize-watcher
+      @click="railMode = false"
     >
       <v-list>
-        <!-- Toggle Rail -->
+        <!-- Toggle Rail (Desktop Only) -->
         <v-list-item
-          @click="rail = !rail"
+          @click="toggleRail"
           class="px-2"
         >
           <template v-slot:prepend>
-            <v-icon :icon="rail ? 'mdi-menu' : 'mdi-menu-open'" />
+            <v-icon :icon="railMode ? 'mdi-menu' : 'mdi-menu-open'" />
           </template>
-          <v-list-item-title v-if="!rail">Menu</v-list-item-title>
+          <v-list-item-title v-if="!railMode">Menu</v-list-item-title>
         </v-list-item>
 
         <v-divider class="my-2" />
@@ -101,7 +115,7 @@
         <!-- Admin Only -->
         <template v-if="isAdmin">
           <v-divider class="my-2" />
-          <v-list-subheader v-if="!rail">Administração</v-list-subheader>
+          <v-list-subheader v-if="!railMode">Administração</v-list-subheader>
           
           <v-list-item
             :to="'/categories'"
@@ -119,6 +133,72 @@
         </template>
       </v-list>
     </v-navigation-drawer>
+
+    <!-- Custom Mobile Sidebar -->
+    <div v-if="isAuthenticated && isMobile">
+      <!-- Overlay -->
+      <div 
+        v-if="sidebarOpen"
+        class="mobile-sidebar-overlay"
+        @click="closeSidebar"
+      />
+      
+      <!-- Sidebar -->
+      <div 
+        class="mobile-sidebar"
+        :class="{ 'mobile-sidebar--open': sidebarOpen }"
+      >
+        <div class="mobile-sidebar__content">
+          <div class="mobile-sidebar__header">
+            <v-icon icon="mdi-chef-hat" color="white" size="32" />
+            <h3 class="mobile-sidebar__title">Chefibook</h3>
+          </div>
+          
+          <v-list class="mobile-sidebar__list">
+            <v-list-item
+              :to="'/'"
+              prepend-icon="mdi-home"
+              title="Início"
+              @click="closeSidebar"
+            />
+            
+            <v-list-item
+              :to="'/recipes'"
+              prepend-icon="mdi-book-open-page-variant"
+              title="Receitas"
+              @click="closeSidebar"
+            />
+            
+            <v-list-item
+              :to="'/recipes/create'"
+              prepend-icon="mdi-plus-circle"
+              title="Nova Receita"
+              @click="closeSidebar"
+            />
+
+            <!-- Admin Only -->
+            <template v-if="isAdmin">
+              <v-divider class="my-2" />
+              <v-list-subheader>Administração</v-list-subheader>
+              
+              <v-list-item
+                :to="'/categories'"
+                prepend-icon="mdi-tag-multiple"
+                title="Categorias"
+                @click="closeSidebar"
+              />
+              
+              <v-list-item
+                :to="'/users'"
+                prepend-icon="mdi-account-group"
+                title="Usuários"
+                @click="closeSidebar"
+              />
+            </template>
+          </v-list>
+        </div>
+      </div>
+    </div>
 
     <!-- Main Content -->
     <v-main>
@@ -155,14 +235,153 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { useNotifications } from '@/composables/useNotifications'
-
-// State
-const rail = ref(false)
+import { useSidebar } from '@/composables/useSidebar'
 
 // Composables
+const route = useRoute()
 const { user, isAuthenticated, isAdmin, logout } = useAuth()
 const { notifications, remove: removeNotification } = useNotifications()
+const { 
+  sidebarOpen, 
+  railMode, 
+  isMobile, 
+  toggleSidebar, 
+  closeSidebar, 
+  toggleRail, 
+  handleNavigation,
+  initializeSidebar 
+} = useSidebar()
+
+// Initialize sidebar based on screen size
+onMounted(() => {
+  initializeSidebar()
+})
+
+// Watch for route changes to close drawer on mobile
+watch(() => route.path, () => {
+  handleNavigation()
+})
 </script>
+
+<style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.v-app-bar {
+  z-index: 1001 !important;
+}
+
+/* Custom Mobile Sidebar */
+.mobile-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 1001;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-sidebar--open {
+  transform: translateX(0);
+}
+
+.mobile-sidebar__content {
+  height: 100%;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.mobile-sidebar__header {
+  display: flex;
+  align-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-sidebar__title {
+  color: white;
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0;
+  margin-left: 12px;
+  line-height: 32px;
+  display: flex;
+  align-items: center;
+  height: 32px;
+}
+
+.mobile-sidebar__list {
+  padding: 16px 0;
+  flex: 1;
+}
+
+.mobile-sidebar__list .v-list-item {
+  padding: 12px 24px;
+  min-height: 56px;
+  border-radius: 0;
+}
+
+.mobile-sidebar__list .v-list-item:hover {
+  background-color: #f5f5f5;
+}
+
+.mobile-sidebar__list .v-list-item--active {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.mobile-sidebar__list .v-list-item-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Mobile adjustments */
+@media (max-width: 599px) {
+  .v-app-bar-title {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .mobile-sidebar {
+    background-color: #1e1e1e;
+    color: white;
+  }
+  
+  .mobile-sidebar__header {
+    background: linear-gradient(135deg, #388e3c, #4caf50);
+  }
+  
+  .mobile-sidebar__list .v-list-item:hover {
+    background-color: #2d2d2d;
+  }
+  
+  .mobile-sidebar__list .v-list-item--active {
+    background-color: #1565c0;
+    color: white;
+  }
+}
+</style>

@@ -10,7 +10,7 @@
                 <div class="brand-icon">
                   <v-icon icon="mdi-chef-hat" size="48" color="white" />
                 </div>
-                <h1 class="brand-title">ChefBook</h1>
+                <h1 class="brand-title">ChefiBook</h1>
               </div>
 
               <h2 class="hero-headline">
@@ -82,7 +82,7 @@
             Pronto para começar?
           </h3>
           <p class="cta-description">
-            Junte-se a milhares de pessoas que já organizam suas receitas com o ChefBook
+            Junte-se a milhares de pessoas que já organizam suas receitas com o ChefiBook
           </p>
           <div class="cta-buttons">
             <v-btn
@@ -101,7 +101,7 @@
               class="about-button"
               elevation="0"
             >
-              Saiba mais sobre o ChefBook
+              Saiba mais sobre o ChefiBook
             </v-btn>
           </div>
         </div>
