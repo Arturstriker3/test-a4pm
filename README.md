@@ -42,7 +42,7 @@ test-4apm/
 1. **Clone o repositório**
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Arturstriker3/test-a4pm
 cd test-4apm
 ```
 
