@@ -34,7 +34,7 @@ export class GetRecipeByIdUseCase {
 			nome: recipe.nome,
 			ingredientes: recipe.ingredientes,
 			modo_preparo: recipe.modo_preparo,
-			tempo_preparo: recipe.tempo_preparo_minutos,
+			tempo_preparo_minutos: recipe.tempo_preparo_minutos,
 			porcoes: recipe.porcoes,
 			id_categorias: recipe.id_categorias,
 			categoria_nome: recipe.categoria_nome || "",
