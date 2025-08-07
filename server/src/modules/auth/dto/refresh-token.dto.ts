@@ -1,10 +1,12 @@
 import { IsString } from "class-validator";
+import { Expose } from "class-transformer";
 import { SchemaProperty, SchemaClass } from "../../../common/decorators";
 
 @SchemaClass({
 	description: "Payload contendo apenas o refresh token para troca de tokens.",
 })
 export class RefreshTokenDto {
+	@Expose()
 	@IsString()
 	@SchemaProperty({
 		description: "Refresh token JWT válido",

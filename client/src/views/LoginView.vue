@@ -20,7 +20,7 @@
               <v-form @submit.prevent="handleLogin" ref="loginForm">
                 <v-text-field
                   v-model="credentials.login"
-                  label="Email ou usuário"
+                  label="Email"
                   prepend-inner-icon="mdi-account"
                   variant="outlined"
                   :rules="[rules.required, rules.email]"
@@ -113,7 +113,7 @@ const rules = {
 }
 
 const { login, isLoading } = useAuth()
-const { error } = useNotifications()
+const { error, success } = useNotifications()
 
 const handleLogin = async () => {
   const { valid } = await loginForm.value.validate()
@@ -125,6 +125,8 @@ const handleLogin = async () => {
     errorMessage.value = result.message || 'Erro ao fazer login'
     showError.value = true
     error('Erro no login', result.message)
+  } else {
+    success('Login realizado com sucesso!', 'Bem-vindo de volta!')
   }
 }
 </script>

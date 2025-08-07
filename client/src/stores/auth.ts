@@ -51,26 +51,9 @@ export const useAuthStore = defineStore("auth", () => {
     isLoading.value = true;
     try {
       const response = await api.post("/auth/register", data);
-      const {
-        token: authToken,
-        userId,
-        nome,
-        email,
-        role,
-      } = response.data.data;
 
-      const userData: User = {
-        id: userId,
-        nome: nome,
-        login: email,
-        nivel_acesso:
-          role === "ADMIN" ? ("ADMIN" as const) : ("DEFAULT" as const),
-      };
-
-      token.value = authToken;
-      user.value = userData;
-      CookieService.setAuthToken(authToken);
-
+      // Registro não retorna token, apenas confirma que o usuário foi criado
+      // O usuário precisará fazer login depois do registro
       return { success: true };
     } catch (error: any) {
       return {

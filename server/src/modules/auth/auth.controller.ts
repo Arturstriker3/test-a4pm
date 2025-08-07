@@ -3,7 +3,7 @@ import { TYPES } from "../../common/types";
 import { AuthService } from "./auth.service";
 import { RegisterDto, RegisterResponseDto, LoginDto, LoginResponseDto, RefreshTokenDto, TokenResponseDto } from "./dto";
 import { RouteAccess, AccessTo, RouteAccessType } from "./decorators/access.decorators";
-import { Controller, Post, Param } from "../../common/decorators";
+import { Controller, Post, Param, Body } from "../../common/decorators";
 import { CurrentUser } from "../../common/decorators";
 import { ApiResponse } from "../../common/responses";
 import { HandleClassExceptions, ApiOperation, ApiBody, ApiCreatedResponse, ApiSuccessResponse, ApiBadRequestResponse, ApiUnauthorizedResponse } from "../../common/decorators";
@@ -32,7 +32,7 @@ export class AuthController {
 	@ApiBadRequestResponse({
 		messageExample: "Email já está em uso",
 	})
-	async register(registerDto: RegisterDto): Promise<ApiResponse<RegisterResponseDto>> {
+	async register(@Body(RegisterDto) registerDto: RegisterDto): Promise<ApiResponse<RegisterResponseDto>> {
 		const response = await this.authService.register(registerDto);
 		return ApiResponse.created(response, "Usuário criado com sucesso");
 	}
@@ -54,7 +54,7 @@ export class AuthController {
 	@ApiUnauthorizedResponse({
 		messageExample: "Credenciais inválidas",
 	})
-	async login(loginDto: LoginDto): Promise<ApiResponse<LoginResponseDto>> {
+	async login(@Body(LoginDto) loginDto: LoginDto): Promise<ApiResponse<LoginResponseDto>> {
 		const response = await this.authService.login(loginDto);
 		return ApiResponse.success(response, "Login realizado com sucesso");
 	}
@@ -76,7 +76,7 @@ export class AuthController {
 	@ApiUnauthorizedResponse({
 		messageExample: "Refresh token inválido ou expirado",
 	})
-	async refresh(refreshTokenDto: RefreshTokenDto): Promise<ApiResponse<TokenResponseDto>> {
+	async refresh(@Body(RefreshTokenDto) refreshTokenDto: RefreshTokenDto): Promise<ApiResponse<TokenResponseDto>> {
 		const response = await this.authService.refreshToken(refreshTokenDto);
 		return ApiResponse.success(response, "Tokens atualizados com sucesso");
 	}

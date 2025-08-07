@@ -159,7 +159,7 @@ const handleRegister = async () => {
     showError.value = true
     error('Erro no cadastro', result.message)
   } else {
-    success('Conta criada com sucesso!', 'Bem-vindo ao ChefiBook!')
+    success('Conta criada com sucesso!', 'Faça login para acessar sua conta.')
   }
 }
 </script>

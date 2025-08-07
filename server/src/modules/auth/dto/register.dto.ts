@@ -1,10 +1,12 @@
 import { IsString, IsEmail, MinLength } from "class-validator";
+import { Expose } from "class-transformer";
 import { SchemaProperty, SchemaClass } from "../../../common/decorators";
 
 @SchemaClass({
 	description: "Dados para registro de novo usuário no sistema",
 })
 export class RegisterDto {
+	@Expose()
 	@IsString()
 	@MinLength(2, { message: "Nome deve ter pelo menos 2 caracteres" })
 	@SchemaProperty({
@@ -14,6 +16,7 @@ export class RegisterDto {
 	})
 	nome!: string;
 
+	@Expose()
 	@IsEmail({}, { message: "Login deve ser um email válido" })
 	@SchemaProperty({
 		description: "Email do usuário (será usado como login)",
@@ -22,6 +25,7 @@ export class RegisterDto {
 	})
 	login!: string;
 
+	@Expose()
 	@IsString()
 	@MinLength(6, { message: "Senha deve ter pelo menos 6 caracteres" })
 	@SchemaProperty({

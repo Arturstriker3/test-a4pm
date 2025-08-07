@@ -14,7 +14,10 @@ export function useAuth() {
   const login = async (credentials: { login: string; senha: string }) => {
     const result = await authStore.login(credentials);
     if (result.success) {
-      router.push("/dashboard");
+      // Pequeno delay para permitir que a notificação seja vista se houver
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
     }
     return result;
   };
@@ -26,7 +29,10 @@ export function useAuth() {
   }) => {
     const result = await authStore.register(data);
     if (result.success) {
-      router.push("/dashboard");
+      // Redireciona para login após registro bem-sucedido
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
     }
     return result;
   };
