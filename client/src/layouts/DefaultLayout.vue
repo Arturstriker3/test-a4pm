@@ -78,17 +78,17 @@
     >
       <v-list>
         <!-- Toggle Rail (Desktop Only) -->
-        <v-list-item
+        <!-- <v-list-item
           @click="toggleRail"
           class="px-2"
         >
           <template v-slot:prepend>
             <v-icon :icon="railMode ? 'mdi-menu' : 'mdi-menu-open'" />
           </template>
-          <v-list-item-title v-if="!railMode">Menu</v-list-item-title>
-        </v-list-item>
+        <v-list-item-title v-if="!railMode" class="sidebar-section-title">Navegação</v-list-item-title>
+        </v-list-item> -->
 
-        <v-divider class="my-2" />
+        <!-- <v-divider class="my-2" /> -->
 
         <!-- Navigation Items -->
         <v-list-item
@@ -274,6 +274,15 @@ watch(() => route.path, () => {
 
 .v-app-bar {
   z-index: 1001 !important;
+}
+
+/* Desktop Sidebar Styles */
+.sidebar-section-title {
+  font-weight: 600 !important;
+color: var(--v-theme-primary) !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Custom Mobile Sidebar */
