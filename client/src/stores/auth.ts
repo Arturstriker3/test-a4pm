@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import api from "@/plugins/axios";
+import { CookieService } from "@/services/cookie.service";
 
 interface User {
   id: string;
@@ -23,23 +24,42 @@ interface RegisterData {
 export const useAuthStore = defineStore("auth", () => {
   // State
   const user = ref<User | null>(null);
-  const token = ref<string | null>(localStorage.getItem("authToken"));
+  const token = ref<string | null>(CookieService.getAuthToken());
   const isLoading = ref(false);
 
   // Getters
   const isAuthenticated = computed(() => !!token.value && !!user.value);
-  const isAdmin = computed(() => user.value?.nivel_acesso === "ADMIN");
+  const isAdmin = computed(
+    () =>
+      user.value?.nivel_acesso === "ADMIN" ||
+      user.value?.nivel_acesso === "admin" ||
+      (user.value as any)?.role === "ADMIN"
+  );
 
   // Actions
   const login = async (credentials: LoginCredentials) => {
     isLoading.value = true;
     try {
       const response = await api.post("/auth/login", credentials);
-      const { token: authToken, user: userData } = response.data.data;
+      const {
+        token: authToken,
+        userId,
+        nome,
+        email,
+        role,
+      } = response.data.data;
+
+      // Mapear a resposta da API para o formato esperado
+      const userData = {
+        id: userId,
+        nome: nome,
+        login: email, // Usando email como login
+        nivel_acesso: role === "ADMIN" ? "ADMIN" : "DEFAULT",
+      };
 
       token.value = authToken;
       user.value = userData;
-      localStorage.setItem("authToken", authToken);
+      CookieService.setAuthToken(authToken);
 
       return { success: true };
     } catch (error: any) {
@@ -56,11 +76,25 @@ export const useAuthStore = defineStore("auth", () => {
     isLoading.value = true;
     try {
       const response = await api.post("/auth/register", data);
-      const { token: authToken, user: userData } = response.data.data;
+      const {
+        token: authToken,
+        userId,
+        nome,
+        email,
+        role,
+      } = response.data.data;
+
+      // Mapear a resposta da API para o formato esperado
+      const userData = {
+        id: userId,
+        nome: nome,
+        login: email, // Usando email como login
+        nivel_acesso: role === "ADMIN" ? "ADMIN" : "DEFAULT",
+      };
 
       token.value = authToken;
       user.value = userData;
-      localStorage.setItem("authToken", authToken);
+      CookieService.setAuthToken(authToken);
 
       return { success: true };
     } catch (error: any) {
@@ -81,7 +115,7 @@ export const useAuthStore = defineStore("auth", () => {
     } finally {
       token.value = null;
       user.value = null;
-      localStorage.removeItem("authToken");
+      CookieService.clearAllTokens();
     }
   };
 
@@ -91,7 +125,7 @@ export const useAuthStore = defineStore("auth", () => {
       const { token: newToken } = response.data.data;
 
       token.value = newToken;
-      localStorage.setItem("authToken", newToken);
+      CookieService.setAuthToken(newToken);
 
       return true;
     } catch (error) {
@@ -104,18 +138,19 @@ export const useAuthStore = defineStore("auth", () => {
     if (!token.value) return;
 
     try {
-      const response = await api.get("/users/profile");
-      user.value = response.data.data;
+      const response = await api.get("/users/me");
+      const { id, nome, email, role } = response.data.data;
+
+      // Mapear resposta da API para o formato esperado
+      user.value = {
+        id: id,
+        nome: nome,
+        login: email,
+        nivel_acesso: role === "ADMIN" ? "ADMIN" : "DEFAULT",
+      };
     } catch (error) {
       console.error("Erro ao buscar perfil do usuário:", error);
       logout();
-    }
-  };
-
-  // Initialize
-  const init = async () => {
-    if (token.value) {
-      await fetchUserProfile();
     }
   };
 
@@ -135,6 +170,5 @@ export const useAuthStore = defineStore("auth", () => {
     logout,
     refreshToken,
     fetchUserProfile,
-    init,
   };
 });

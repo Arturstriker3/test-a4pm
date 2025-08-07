@@ -51,14 +51,37 @@ const router = createRouter({
 });
 
 // Navigation guards
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
+  // Só busca perfil se temos token mas não temos dados do usuário
+  // Isso acontece quando a página é recarregada
+  if (authStore.token && !authStore.user) {
+    try {
+      await authStore.fetchUserProfile();
+    } catch (error) {
+      console.error("Erro ao carregar perfil do usuário:", error);
+      // Se falhar, o fetchUserProfile já chama logout()
+    }
+  }
+
+  // Rota requer autenticação mas usuário não está logado
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    console.log("Redirecionando para login - usuário não autenticado");
     next("/login");
-  } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+  }
+  // Rota é para convidados mas usuário está logado
+  else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    console.log("Redirecionando para dashboard - usuário já autenticado");
     next("/dashboard");
-  } else {
+  }
+  // Usuário autenticado acessando home, redireciona para dashboard
+  else if (to.path === "/" && authStore.isAuthenticated) {
+    console.log("Redirecionando usuário logado da home para dashboard");
+    next("/dashboard");
+  }
+  // Permite a navegação
+  else {
     next();
   }
 });

@@ -137,6 +137,22 @@ export class AuthMiddleware {
 	}
 
 	/**
+	 * Gera um refresh token (tempo de vida maior)
+	 */
+	static generateRefreshToken(payload: Omit<JwtPayload, "iat" | "exp">): string {
+		const secret = AuthMiddleware.JWT_SECRET;
+		if (!secret) {
+			throw new Error("JWT_SECRET não configurado nas variáveis de ambiente");
+		}
+
+		const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
+
+		return jwt.sign(payload as object, secret, {
+			expiresIn: expiresIn,
+		} as jwt.SignOptions);
+	}
+
+	/**
 	 * Verifica se um token é válido sem lançar exceção
 	 */
 	static verifyToken(token: string): JwtPayload | null {

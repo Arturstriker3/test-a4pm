@@ -1,6 +1,6 @@
 import axios from "axios";
+import { CookieService } from "@/services/cookie.service";
 
-// Configuração base do Axios
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api",
   timeout: 10000,
@@ -32,7 +32,7 @@ const processQueue = (error: any, token: string | null = null) => {
 // Interceptor para adicionar token de autenticação
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("authToken");
+    const token = CookieService.getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -80,8 +80,8 @@ api.interceptors.response.use(
         const refreshResponse = await api.post("/auth/refresh");
         const { token: newToken } = refreshResponse.data.data;
 
-        // Atualiza o token no localStorage
-        localStorage.setItem("authToken", newToken);
+        // Atualiza o token no cookie
+        CookieService.setAuthToken(newToken);
 
         // Processa a fila de requisições pendentes
         processQueue(null, newToken);
@@ -90,9 +90,9 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // Falha no refresh - remove token e redireciona para login
+        // Falha no refresh - remove tokens e redireciona para login
         processQueue(refreshError, null);
-        localStorage.removeItem("authToken");
+        CookieService.clearAllTokens();
         window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {

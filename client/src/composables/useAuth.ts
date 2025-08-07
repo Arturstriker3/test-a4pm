@@ -6,17 +6,15 @@ export function useAuth() {
   const authStore = useAuthStore();
   const router = useRouter();
 
-  // Computed properties
   const user = computed(() => authStore.user);
   const isAuthenticated = computed(() => authStore.isAuthenticated);
   const isAdmin = computed(() => authStore.isAdmin);
   const isLoading = computed(() => authStore.isLoading);
 
-  // Methods
   const login = async (credentials: { login: string; senha: string }) => {
     const result = await authStore.login(credentials);
     if (result.success) {
-      router.push("/");
+      router.push("/dashboard");
     }
     return result;
   };
@@ -28,7 +26,7 @@ export function useAuth() {
   }) => {
     const result = await authStore.register(data);
     if (result.success) {
-      router.push("/");
+      router.push("/dashboard");
     }
     return result;
   };
@@ -59,13 +57,11 @@ export function useAuth() {
   };
 
   return {
-    // State
     user,
     isAuthenticated,
     isAdmin,
     isLoading,
 
-    // Methods
     login,
     register,
     logout,
